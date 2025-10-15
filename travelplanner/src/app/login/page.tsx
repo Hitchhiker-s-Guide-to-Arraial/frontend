@@ -45,7 +45,7 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -69,6 +69,16 @@ export default function LoginPage() {
         >
           Login
         </button>
+
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">
+            Don't have an account?{" "}
+            <a href="/register" className="text-blue-500 hover:underline">
+              Sign up
+            </a>
+          </p>
+        </div>
+
       </form>
     </div>
   );
