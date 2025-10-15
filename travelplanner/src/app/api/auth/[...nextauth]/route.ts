@@ -8,10 +8,10 @@ console.log("🔍 REGISTER - Array memory location:", db.users);
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         console.log("🔐 Login attempt for email:", credentials?.email);
