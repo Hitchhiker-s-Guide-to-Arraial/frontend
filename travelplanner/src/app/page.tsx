@@ -60,9 +60,11 @@ export default function Home() {
               </div>
 
               <div className="flex-1">
+                <Link href="/gerir" className="block">
                 <button className="w-full bg-green-500 text-white rounded-lg py-3 px-4 hover:bg-green-600 transition shadow-md">
                   Gerir
                 </button>
+                </Link>
               </div>
             </div>
           </div>
