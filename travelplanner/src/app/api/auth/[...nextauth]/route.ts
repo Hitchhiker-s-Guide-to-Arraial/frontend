@@ -1,7 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "@/lib/db";
-
 
 const handler = NextAuth({
   providers: [
@@ -13,34 +11,46 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         console.log("🔐 Login attempt for email:", credentials?.email);
-        
+
         if (!credentials?.email || !credentials?.password) {
           console.log("❌ Missing credentials");
           return null;
         }
 
-        // Find user by email
-        const user = db.users.find((user) => user.email === credentials.email);
-        console.log("👤 Found user:", user);
-        console.log("📋 All users in db:", db.users);
-        
-        // Check if user exists and password matches
-        if (user && user.password === credentials.password) {
-          console.log("✅ Login successful for user:", user.email);
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-          };
-        }
+        try {
+          // ✅ Call your backend /api/login
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
 
-        console.log("❌ Login failed - user not found or password mismatch");
-        console.log("🔍 Expected password:", user?.password);
-        console.log("🔍 Provided password:", credentials.password);
-        console.log("🔍 Password match:", user?.password === credentials.password);
-        return null;
-      }
-    })
+          const data = await response.json();
+          console.log("📩 Backend response:", data);
+
+          if (!response.ok || !data?.success) {
+            console.log("❌ Backend rejected login:", data?.error);
+            return null;
+          }
+
+          // ✅ Return the user object for the session
+          return {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+          };
+        } catch (error) {
+          console.error("🚨 Login error:", error);
+          return null;
+        }
+      },
+    }),
   ],
   pages: {
     signIn: "/login",
@@ -52,12 +62,16 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.email = token.email;
+        session.user.name = token.name;
       }
       return session;
     },

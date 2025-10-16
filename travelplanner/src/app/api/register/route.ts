@@ -1,48 +1,42 @@
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-
-console.log("🔍 REGISTER - Initial users:", db.users);
-console.log("🔍 REGISTER - Array memory location:", db.users);
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name } = await request.json();
+    const { name, email, password } = await request.json();
 
-    // Validate input
-    if (!email || !password || !name) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Email, password, and name are required" },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
 
-    // Check if user already exists
-    const existingUser = db.users.find((user) => user.email === email);
-    if (existingUser) {
+    // 🔄 Forward the request to your backend API
+    const backendResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/register`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      }
+    );
+
+    const data = await backendResponse.json();
+
+    if (!backendResponse.ok) {
       return NextResponse.json(
-        { error: "User already exists" },
-        { status: 400 }
+        { error: data.error || "Registration failed" },
+        { status: backendResponse.status }
       );
     }
 
-    // Create new user
-    const newUser = {
-      id: (db.users.length + 1).toString(),
-      email,
-      password, // In production, hash this!
-      name,
-    };
-
-    db.users.push(newUser);
-    console.log("Registered user:", newUser); // Debug log
-    console.log("All users:", db.users); // Debug log
-
+    // ✅ Registration successful
     return NextResponse.json(
-      { message: "User created successfully", userId: newUser.id },
+      { message: "User registered successfully", data },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("❌ Registration error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
