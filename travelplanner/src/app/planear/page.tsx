@@ -43,8 +43,8 @@ export default function PlanearPage() {
       // Wait 2 seconds before redirecting
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Redirect to home page
-      router.push("/");
+      
+      router.push("/recs");
     } catch (error) {
       console.error("Error submitting form:", error);
       // You could add an error state here if needed
@@ -71,7 +71,7 @@ export default function PlanearPage() {
           <CheckCircle2 className="h-5 w-5" />
           <div>
             <p className="font-semibold">Plano criado com sucesso!</p>
-            <p className="text-sm text-green-100">A redirecionar para a página inicial...</p>
+            <p className="text-sm text-green-100">A redirecionar...</p>
           </div>
         </div>
       )}
