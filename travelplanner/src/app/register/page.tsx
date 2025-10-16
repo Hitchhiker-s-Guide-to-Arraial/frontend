@@ -17,6 +17,7 @@ export default function RegisterPage() {
     setError("");
     setIsLoading(true);
 
+    // Basic validation
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       setIsLoading(false);
@@ -30,10 +31,17 @@ export default function RegisterPage() {
     }
 
     try {
+      // Register the user
       const response = await fetch("/api/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+        }),
       });
 
       const data = await response.json();
@@ -42,15 +50,23 @@ export default function RegisterPage() {
         throw new Error(data.error || "Registration failed");
       }
 
+      console.log("Registration successful, attempting auto-login...");
+
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
+      console.log("Login result:", result);
+
       if (result?.error) {
+        console.log("Login error details:", result.error);
         setError("Registration successful but login failed. Please try logging in manually.");
+        // Optional: Redirect to login page instead of showing error
+        // setTimeout(() => router.push("/login"), 2000);
       } else {
+        console.log("Auto-login successful, redirecting to home...");
         router.push("/");
       }
     } catch (error) {
@@ -62,7 +78,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen w-full flex bg-gray-100">
-      {/* Coluna esquerda: formulário */}
+      {/* Coluna esquerda: formulário (visual igual ao login) */}
       <div className="w-full lg:w-[45%] relative flex flex-col justify-center items-center px-8 lg:px-20 bg-white pt-16 lg:pt-0">
         {/* Logótipo — centrado em mobile, à esquerda em desktop */}
         <div className="absolute top-5 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0">
@@ -70,7 +86,7 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="w-full max-w-sm">
-          <h1 className="text-3xl font-semibold mb-8 text-black">Create Account</h1>
+          <h1 className="text-3xl font-bold mb-8 text-left text-black">Create Account</h1>
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -79,7 +95,7 @@ export default function RegisterPage() {
           )}
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Full Name
             </label>
             <input
@@ -92,7 +108,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Email
             </label>
             <input
@@ -105,7 +121,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Password
             </label>
             <input
@@ -119,7 +135,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-medium mb-2">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
               Confirm Password
             </label>
             <input
@@ -139,7 +155,7 @@ export default function RegisterPage() {
             {isLoading ? "Creating Account..." : "Create Account"}
           </button>
 
-          {/* Divider “or” */}
+          {/* Divider “or” (igual ao login) */}
           <div className="flex items-center my-6">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-3 text-gray-500 text-sm">or</span>
@@ -157,7 +173,7 @@ export default function RegisterPage() {
         </form>
       </div>
 
-      {/* Coluna direita: imagem */}
+      {/* Coluna direita: imagem (igual ao login, sem bordas arredondadas) */}
       <div className="hidden lg:block w-[60%] relative">
         <div
           className="absolute inset-0 bg-cover bg-center"
