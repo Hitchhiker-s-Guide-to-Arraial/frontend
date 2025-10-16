@@ -12,10 +12,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, X, Loader2, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
 
 export default function PlanearPage() {
   const router = useRouter();
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [formData, setFormData] = useState({
     budget: "",
     category: "",
@@ -42,7 +43,6 @@ export default function PlanearPage() {
 
       // Wait 2 seconds before redirecting
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
       
       router.push("/recs");
     } catch (error) {

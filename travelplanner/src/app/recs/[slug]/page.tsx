@@ -3,6 +3,7 @@
 import { notFound } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { use, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 
 interface Props {
   params: Promise<{
@@ -47,6 +48,7 @@ export default function RecommendationDetail({ params }: Props) {
   const router = useRouter();
   const [isAddingToGerir, setIsAddingToGerir] = useState(false);
   const [isGoingToGerir, setIsGoingToGerir] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   
   // Unwrap the params promise using React.use()
   const unwrappedParams = use(params);
@@ -71,7 +73,11 @@ export default function RecommendationDetail({ params }: Props) {
       // Wait 1.5 seconds
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      alert(`Added ${recommendation.name} to Gerir page!`);
+      // Show toast instead of alert
+      setShowSuccess(true);
+      // Auto hide toast after 3 seconds
+      setTimeout(() => setShowSuccess(false), 3000);
+      
     } finally {
       setIsAddingToGerir(false);
     }
@@ -91,6 +97,17 @@ export default function RecommendationDetail({ params }: Props) {
 
   return (
     <main className="min-h-screen p-8">
+      {/* Custom Success Toast */}
+      {showSuccess && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-right duration-300">
+          <CheckCircle2 className="h-5 w-5" />
+          <div>
+            <p className="font-semibold">Added to Gerir successfully!</p>
+            <p className="text-sm text-green-100">{recommendation.name} was added to your Gerir page</p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-4">{recommendation.name}</h1>
         <p className="text-lg text-gray-600 mb-8">{recommendation.description}</p>
