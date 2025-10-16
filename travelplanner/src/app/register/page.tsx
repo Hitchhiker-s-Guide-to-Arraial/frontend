@@ -3,15 +3,6 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -22,65 +13,69 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
-  setIsLoading(true);
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-  if (password !== confirmPassword) {
-    setError("Passwords don't match");
-    setIsLoading(false);
-    return;
-  }
+    // Basic validation
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      setIsLoading(false);
+      return;
+    }
 
-  if (password.length < 6) {
-    setError("Password must be at least 6 characters");
-    setIsLoading(false);
-    return;
-  }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
+    }
 
-  try {
-    // ✅ Hash the password client-side
-    const hashedPassword = await hashPassword(password);
+    try {
+      // Register the user
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+        }),
+      });
 
-    // Send the hashed version to the backend
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      console.log("Registration successful, attempting auto-login...");
+
+      const result = await signIn("credentials", {
         name,
         email,
-        password: hashedPassword,
-      }),
-    });
+        password,
+        redirect: false,
+      });
 
-    const data = await response.json();
+      console.log("Login result:", result);
 
-    if (!response.ok) {
-      throw new Error(data.error || "Registration failed");
+      if (result?.error) {
+        console.log("Login error details:", result.error);
+        setError("Registration successful but login failed. Please try logging in manually.");
+        // Optional: Redirect to login page instead of showing error
+        // setTimeout(() => router.push("/login"), 2000);
+      } else {
+        console.log("Auto-login successful, redirecting to home...");
+        router.push("/");
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
-
-    console.log("Registration successful, attempting auto-login...");
-
-    // Try auto-login using the *same hashed password* (backend should expect this)
-    const result = await signIn("credentials", {
-      email,
-      password: hashedPassword,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      setError(
-        "Registration successful but login failed. Please try logging in manually."
-      );
-    } else {
-      router.push("/");
-    }
-  } catch (error) {
-    setError(error instanceof Error ? error.message : "Registration failed");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen w-full flex bg-gray-100">
