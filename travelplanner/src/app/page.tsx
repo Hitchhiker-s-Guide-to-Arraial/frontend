@@ -5,18 +5,20 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
+
   const slides = [
     { src: "/HP1.svg", alt: "Homepage Design 1" },
     { src: "/HP2.svg", alt: "Homepage Design 2" },
     { src: "/HP3.svg", alt: "Homepage Design 3" },
   ];
 
+  // ciclo automático de slides
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -24,11 +26,10 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
+  // redireciona se não estiver autenticado
   useEffect(() => {
     if (status === "loading") return;
-    if (!session) {
-      router.push("/login");
-    }
+    if (!session) router.push("/login");
   }, [session, status, router]);
 
   if (status === "loading") {
@@ -46,7 +47,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F5F7FE] flex flex-col items-center">
-      {/* HEADER — igual ao da página Gerir */}
+      {/* HEADER – igual ao da página "Gerir" */}
       <header className="relative flex items-center justify-center bg-white shadow-sm py-4 px-6 w-full">
         {/* Logótipo centrado */}
         <img
@@ -61,32 +62,52 @@ export default function Home() {
           className="absolute right-6 h-9 w-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition"
           title="Profile"
         >
-          <img src="/profile.svg" alt="Profile" className="h-6 w-6 object-contain" />
+          <img
+            src="/profile.svg"
+            alt="Profile"
+            className="h-6 w-6 object-contain"
+          />
         </button>
       </header>
 
-      {/* BANNER / Carrossel com 100% de correspondência visual */}
-      <section className="w-full max-w-6xl px-4 mt-4">
+      {/* BANNER com o mesmo comportamento do anterior */}
+      <section className="w-full max-w-6xl px-4 mt-6">
         <div
-          className="relative h-[24rem] rounded-2xl overflow-hidden shadow-md transition-all duration-700 ease-in-out"
-          style={{
-            backgroundImage: `url(${slides[currentSlide].src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+          className="relative rounded-2xl overflow-hidden shadow-md bg-gray-200"
+          style={{ height: "24rem" }}
         >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.6 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={slides[currentSlide].src}
+                alt={slides[currentSlide].alt}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="object-cover"
+              />
+            </motion.div>
+          </AnimatePresence>
+
           {/* Dots */}
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                aria-label={`Ir para o slide ${index + 1}`}
                 className={`w-2.5 h-2.5 rounded-full transition-all ${
                   currentSlide === index
                     ? "bg-white ring-2 ring-black/20"
                     : "bg-white/70 hover:bg-white"
                 }`}
+                aria-label={`Ir para o slide ${index + 1}`}
               />
             ))}
           </div>
@@ -110,7 +131,9 @@ export default function Home() {
               />
             </div>
             <div className="flex items-center justify-between px-1 mt-3">
-              <span className="font-semibold text-gray-800">Plan my next trip</span>
+              <span className="font-semibold text-gray-800">
+                Plan my next trip
+              </span>
               <Image src="/arrow.svg" alt="arrow" width={20} height={20} />
             </div>
           </div>
@@ -131,7 +154,9 @@ export default function Home() {
               />
             </div>
             <div className="flex items-center justify-between px-1 mt-3">
-              <span className="font-semibold text-gray-800">Manage my trips</span>
+              <span className="font-semibold text-gray-800">
+                Manage my trips
+              </span>
               <Image src="/arrow.svg" alt="arrow" width={20} height={20} />
             </div>
           </div>
@@ -139,7 +164,7 @@ export default function Home() {
       </section>
 
       {/* Sign out */}
-      <div className="mt-10">
+      <div className="mt-10 mb-10">
         <button
           onClick={() => signOut()}
           className="text-sm text-gray-600 hover:text-red-600 transition"
