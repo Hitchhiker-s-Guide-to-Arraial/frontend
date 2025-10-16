@@ -55,31 +55,86 @@ export default function PlanearPage() {
     "Nightlife", "Adventure Sports", "Relaxation", "Cultural Events", "Nature", "Photography"
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      // Calculate duration if both start and end dates are selected
-      const calculatedDuration = startDate && endDate ? differenceInDays(endDate, startDate) + 1 : duration;
-      
-      console.log("Form submitted:", { 
-        ...formData, 
-        startDate, 
-        endDate, 
-        duration: calculatedDuration, 
-        selectedActivities 
-      });
-      
-      setShowSuccess(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      router.push("/recs");
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    const saveTripToProfile = (tripData: any) => {
+    const newTrip = {
+      id: Date.now().toString(),
+      departure: tripData.departure,
+      destination: tripData.hasDestination === 'yes' ? 'Specific destination' : 'Open to suggestions',
+      destinationCity: tripData.destinationCity,
+      differentContinent: tripData.differentContinent,
+      travelers: tripData.travelers,
+      startDate: startDate,
+      endDate: endDate,
+      duration: startDate && endDate ? differenceInDays(endDate, startDate) + 1 : duration,
+      activities: selectedActivities,
+      budget: tripData.budget,
+      createdAt: new Date()
+    };
+
+    // Get existing trips from localStorage
+    const existingTrips = JSON.parse(localStorage.getItem('savedTrips') || '[]');
+    
+    // Add new trip
+    const updatedTrips = [newTrip, ...existingTrips];
+    
+    // Save back to localStorage
+    localStorage.setItem('savedTrips', JSON.stringify(updatedTrips));
+    
+    return newTrip;
   };
+
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+
+  try {
+    // Calculate duration if both start and end dates are selected
+    const calculatedDuration = startDate && endDate ? differenceInDays(endDate, startDate) + 1 : duration;
+    
+    const tripData = { 
+      ...formData, 
+      startDate, 
+      endDate, 
+      duration: calculatedDuration, 
+      selectedActivities 
+    };
+    
+    console.log("Form submitted:", tripData);
+    
+    // Save trip to profile (for history)
+    const savedTrip = saveTripToProfile(formData);
+    console.log("Trip saved:", savedTrip);
+    
+    // Prepare data for recommendations
+    const recommendationData = {
+      departure: formData.departure,
+      destination: formData.hasDestination === 'yes' ? formData.destinationCity : 'flexible',
+      differentContinent: formData.differentContinent === 'yes',
+      travelers: parseInt(formData.travelers),
+      startDate: startDate,
+      endDate: endDate,
+      duration: calculatedDuration,
+      activities: selectedActivities,
+      budget: parseFloat(formData.budget),
+      travelStyle: formData.differentContinent === 'yes' ? 'international' : 'regional'
+    };
+    
+    // Store data for recommendations page to use
+    localStorage.setItem('currentTripData', JSON.stringify(recommendationData));
+    
+    setShowSuccess(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Redirect to recommendations page instead of profile
+    router.push("/recs");
+  } catch (error) {
+    console.error("Error submitting form:", error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleNextStep = () => {
     const steps: FormStep[] = getNextSteps();
