@@ -75,130 +75,130 @@ export default function RecsPage() {
     }, 1500); // Simulate loading time
   };
 
-const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] => {
-  // This is where you would integrate with your actual backend/LLM
-  // For now, we'll simulate personalized recommendations based on the trip data
-  
-  const baseRecommendations = [
-    {
-      id: 1,
-      name: "Cultural City Escape",
-      description: `Perfect for ${tripData.travelers} travelers from ${tripData.departure} looking for ${tripData.activities.join(', ')}`,
-      location: tripData.destination !== 'flexible' ? tripData.destination : "Lisbon, Portugal",
-      estimatedCost: tripData.budget * 0.8,
-      bestSeason: "Spring/Fall",
-      activities: tripData.activities.slice(0, 3),
-      matchScore: 95,
-      slug: "rec-1" // Fixed slug
-    },
-    {
-      id: 2,
-      name: "Adventure Getaway",
-      description: `Tailored for your ${tripData.duration || 7}-day trip with focus on ${tripData.activities[0] || 'adventure'}`,
-      location: tripData.differentContinent ? "Bali, Indonesia" : "Algarve, Portugal",
-      estimatedCost: tripData.budget * 0.6,
-      bestSeason: "Summer",
-      activities: ["Adventure Sports", "Nature", ...tripData.activities.filter(a => a !== 'Adventure Sports')],
-      matchScore: 88,
-      slug: "rec-2" // Fixed slug
-    },
-    {
-      id: 3,
-      name: "Relaxing Beach Retreat",
-      description: `Ideal ${tripData.travelStyle} vacation from ${tripData.departure} within your €${tripData.budget} budget`,
-      location: "Algarve, Portugal",
-      estimatedCost: tripData.budget * 0.7,
-      bestSeason: "Summer",
-      activities: ["Beach", "Relaxation", "Food & Dining"],
-      matchScore: 82,
-      slug: "rec-3" // Fixed slug
-    },
-    {
-      id: 4,
-      name: "Mountain Exploration",
-      description: `Based on your interest in ${tripData.activities.join(' and ')} for ${tripData.travelers} people`,
-      location: "Serra da Estrela, Portugal",
-      estimatedCost: tripData.budget * 0.5,
-      bestSeason: "All Year",
-      activities: ["Hiking", "Nature", "Photography"],
-      matchScore: 78,
-      slug: "rec-4" // Fixed slug
-    },
-    {
-      id: 5,
-      name: "Historic Tour",
-      description: `Cultural journey perfect for your ${tripData.duration || 5}-day itinerary`,
-      location: "Porto, Portugal",
-      estimatedCost: tripData.budget * 0.9,
-      bestSeason: "Spring/Fall",
-      activities: ["City Tours", "Museums", "Cultural Events"],
-      matchScore: 85,
-      slug: "rec-5" // Fixed slug
-    }
-  ];
+  const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] => {
+    // This is where you would integrate with your actual backend/LLM
+    // For now, we'll simulate personalized recommendations based on the trip data
+    
+    const baseRecommendations = [
+      {
+        id: 1,
+        name: "Cultural City Escape",
+        description: `Perfect for ${tripData.travelers} travelers from ${tripData.departure} looking for ${tripData.activities.join(', ')}`,
+        location: tripData.destination !== 'flexible' ? tripData.destination : "Lisbon, Portugal",
+        estimatedCost: tripData.budget * 0.8,
+        bestSeason: "Spring/Fall",
+        activities: tripData.activities.slice(0, 3),
+        matchScore: 95,
+        slug: "rec-1"
+      },
+      {
+        id: 2,
+        name: "Adventure Getaway",
+        description: `Tailored for your ${tripData.duration || 7}-day trip with focus on ${tripData.activities[0] || 'adventure'}`,
+        location: tripData.differentContinent ? "Bali, Indonesia" : "Algarve, Portugal",
+        estimatedCost: tripData.budget * 0.6,
+        bestSeason: "Summer",
+        activities: ["Adventure Sports", "Nature", ...tripData.activities.filter(a => a !== 'Adventure Sports')],
+        matchScore: 88,
+        slug: "rec-2"
+      },
+      {
+        id: 3,
+        name: "Relaxing Beach Retreat",
+        description: `Ideal ${tripData.travelStyle} vacation from ${tripData.departure} within your €${tripData.budget} budget`,
+        location: "Algarve, Portugal",
+        estimatedCost: tripData.budget * 0.7,
+        bestSeason: "Summer",
+        activities: ["Beach", "Relaxation", "Food & Dining"],
+        matchScore: 82,
+        slug: "rec-3"
+      },
+      {
+        id: 4,
+        name: "Mountain Exploration",
+        description: `Based on your interest in ${tripData.activities.join(' and ')} for ${tripData.travelers} people`,
+        location: "Serra da Estrela, Portugal",
+        estimatedCost: tripData.budget * 0.5,
+        bestSeason: "All Year",
+        activities: ["Hiking", "Nature", "Photography"],
+        matchScore: 78,
+        slug: "rec-4"
+      },
+      {
+        id: 5,
+        name: "Historic Tour",
+        description: `Cultural journey perfect for your ${tripData.duration || 5}-day itinerary`,
+        location: "Porto, Portugal",
+        estimatedCost: tripData.budget * 0.9,
+        bestSeason: "Spring/Fall",
+        activities: ["City Tours", "Museums", "Cultural Events"],
+        matchScore: 85,
+        slug: "rec-5"
+      }
+    ];
 
-  return baseRecommendations;
-};
+    return baseRecommendations;
+  };
 
- const getGenericRecommendations = (): Recommendation[] => {
-  return [
-    {
-      id: 1,
-      name: "Beach Paradise",
-      description: "Relaxing beach vacation with stunning ocean views",
-      location: "Algarve, Portugal",
-      estimatedCost: 1200,
-      bestSeason: "Summer",
-      activities: ["Beach", "Swimming", "Relaxation"],
-      matchScore: 75,
-      slug: "rec-1" // Fixed slug
-    },
-    {
-      id: 2,
-      name: "City Explorer",
-      description: "Urban adventure through historic city centers",
-      location: "Lisbon, Portugal",
-      estimatedCost: 1500,
-      bestSeason: "Spring/Fall",
-      activities: ["City Tours", "Museums", "Food & Dining"],
-      matchScore: 70,
-      slug: "rec-2" // Fixed slug
-    },
-    {
-      id: 3,
-      name: "Mountain Retreat",
-      description: "Peaceful getaway in the mountains",
-      location: "Serra da Estrela, Portugal",
-      estimatedCost: 800,
-      bestSeason: "All Year",
-      activities: ["Hiking", "Nature", "Photography"],
-      matchScore: 65,
-      slug: "rec-3" // Fixed slug
-    },
-    {
-      id: 4,
-      name: "Cultural Journey",
-      description: "Immerse yourself in local culture and traditions",
-      location: "Porto, Portugal",
-      estimatedCost: 1100,
-      bestSeason: "Spring/Fall",
-      activities: ["Cultural Events", "Museums", "Food & Dining"],
-      matchScore: 72,
-      slug: "rec-4" // Fixed slug
-    },
-    {
-      id: 5,
-      name: "Adventure Seekers",
-      description: "Thrilling activities for the adventurous soul",
-      location: "Azores, Portugal",
-      estimatedCost: 1800,
-      bestSeason: "Summer",
-      activities: ["Adventure Sports", "Hiking", "Nature"],
-      matchScore: 68,
-      slug: "rec-5" // Fixed slug
-    }
-  ];
-};
+  const getGenericRecommendations = (): Recommendation[] => {
+    return [
+      {
+        id: 1,
+        name: "Beach Paradise",
+        description: "Relaxing beach vacation with stunning ocean views",
+        location: "Algarve, Portugal",
+        estimatedCost: 1200,
+        bestSeason: "Summer",
+        activities: ["Beach", "Swimming", "Relaxation"],
+        matchScore: 75,
+        slug: "rec-1"
+      },
+      {
+        id: 2,
+        name: "City Explorer",
+        description: "Urban adventure through historic city centers",
+        location: "Lisbon, Portugal",
+        estimatedCost: 1500,
+        bestSeason: "Spring/Fall",
+        activities: ["City Tours", "Museums", "Food & Dining"],
+        matchScore: 70,
+        slug: "rec-2"
+      },
+      {
+        id: 3,
+        name: "Mountain Retreat",
+        description: "Peaceful getaway in the mountains",
+        location: "Serra da Estrela, Portugal",
+        estimatedCost: 800,
+        bestSeason: "All Year",
+        activities: ["Hiking", "Nature", "Photography"],
+        matchScore: 65,
+        slug: "rec-3"
+      },
+      {
+        id: 4,
+        name: "Cultural Journey",
+        description: "Immerse yourself in local culture and traditions",
+        location: "Porto, Portugal",
+        estimatedCost: 1100,
+        bestSeason: "Spring/Fall",
+        activities: ["Cultural Events", "Museums", "Food & Dining"],
+        matchScore: 72,
+        slug: "rec-4"
+      },
+      {
+        id: 5,
+        name: "Adventure Seekers",
+        description: "Thrilling activities for the adventurous soul",
+        location: "Azores, Portugal",
+        estimatedCost: 1800,
+        bestSeason: "Summer",
+        activities: ["Adventure Sports", "Hiking", "Nature"],
+        matchScore: 68,
+        slug: "rec-5"
+      }
+    ];
+  };
 
   // Full page loading splash for navigation
   if (isNavigating) {
@@ -230,12 +230,12 @@ const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] =>
     <main className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-6xl mx-auto">
         {/* Header with trip summary */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">
             {tripData ? "Your Personalized Recommendations" : "Top 5 Recommendations"}
           </h1>
           {tripData && (
-            <div className="bg-white rounded-lg p-6 shadow-sm max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg p-6 shadow-sm max-w-2xl mx-auto mb-6">
               <p className="text-lg text-gray-700 mb-2">
                 Based on your trip from <strong>{tripData.departure}</strong>{" "}
                 {tripData.destination !== 'flexible' && `to ${tripData.destination}`}
@@ -250,6 +250,34 @@ const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] =>
               </div>
             </div>
           )}
+        </div>
+
+        {/* Action Buttons - Moved to top */}
+        <div className="flex justify-center gap-4 mb-12">
+          <Button 
+            onClick={() => handleNavigation("/profile", "Going to your profile...")}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <User className="h-4 w-4" />
+            My Profile
+          </Button>
+          <Button 
+            onClick={() => handleNavigation("/", "Going home...")}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Home className="h-4 w-4" />
+            Home Page
+          </Button>
+          <Button 
+            onClick={() => handleNavigation("/gerir", "Managing your trips...")}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <FolderOpen className="h-4 w-4" />
+            Manage Trips
+          </Button>
         </div>
 
         {/* Recommendations Grid */}
@@ -308,33 +336,6 @@ const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] =>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-center gap-4 mt-12">
-          <Button 
-            onClick={() => handleNavigation("/profile", "Going to your profile...")}
-            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600"
-          >
-            <User className="h-4 w-4" />
-            My Profile
-          </Button>
-          <Button 
-            onClick={() => handleNavigation("/", "Going home...")}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Home className="h-4 w-4" />
-            Home Page
-          </Button>
-          <Button 
-            onClick={() => handleNavigation("/gerir", "Managing your trips...")}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <FolderOpen className="h-4 w-4" />
-            Manage Trips
-          </Button>
         </div>
       </div>
     </main>
