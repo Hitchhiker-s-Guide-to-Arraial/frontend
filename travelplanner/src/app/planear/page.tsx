@@ -9,25 +9,50 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, X, Loader2, CheckCircle2 } from "lucide-react";
-import { format } from "date-fns";
+import { CalendarIcon, X, Loader2, CheckCircle2, ArrowLeft, Users, Clock } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 
+type FormStep = 
+  | 'departure' 
+  | 'destination' 
+  | 'destinationCity' 
+  | 'differentContinent' 
+  | 'travelers' 
+  | 'startDate' 
+  | 'endDate' 
+  | 'duration' 
+  | 'activities' 
+  | 'budget' 
+  | 'summary';
+
 export default function PlanearPage() {
   const router = useRouter();
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [currentStep, setCurrentStep] = useState<FormStep>('departure');
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [duration, setDuration] = useState<number | undefined>();
+  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [formData, setFormData] = useState({
+    departure: "",
+    hasDestination: "",
+    destinationCity: "",
+    differentContinent: "",
+    travelers: "",
+    wantsStartDate: "",
+    wantsEndDate: "",
+    wantsDuration: "",
+    wantsActivities: "",
     budget: "",
-    category: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const categories = [
-    "Beach",
-    "City",
-    "Rural"
+  const continents = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania"];
+  const activities = [
+    "Beach", "Hiking", "City Tours", "Museums", "Shopping", "Food & Dining",
+    "Nightlife", "Adventure Sports", "Relaxation", "Cultural Events", "Nature", "Photography"
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,21 +60,63 @@ export default function PlanearPage() {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call or form processing
-      console.log("Form submitted:", { ...formData, dateRange });
+      // Calculate duration if both start and end dates are selected
+      const calculatedDuration = startDate && endDate ? differenceInDays(endDate, startDate) + 1 : duration;
       
-      // Show success message
+      console.log("Form submitted:", { 
+        ...formData, 
+        startDate, 
+        endDate, 
+        duration: calculatedDuration, 
+        selectedActivities 
+      });
+      
       setShowSuccess(true);
-
-      // Wait 2 seconds before redirecting
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
       router.push("/recs");
     } catch (error) {
       console.error("Error submitting form:", error);
-      // You could add an error state here if needed
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleNextStep = () => {
+    const steps: FormStep[] = getNextSteps();
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex < steps.length - 1) {
+      setCurrentStep(steps[currentIndex + 1]);
+    }
+  };
+
+  const getNextSteps = (): FormStep[] => {
+    const baseSteps: FormStep[] = ['departure', 'destination', 'travelers', 'startDate', 'endDate', 'activities', 'budget', 'summary'];
+    
+    // Insert destinationCity after destination if user has a specific destination
+    if (formData.hasDestination === 'yes') {
+      const destinationIndex = baseSteps.indexOf('destination');
+      baseSteps.splice(destinationIndex + 1, 0, 'destinationCity');
+    }
+    // Insert differentContinent after destination if user doesn't have a specific destination
+    else if (formData.hasDestination === 'no') {
+      const destinationIndex = baseSteps.indexOf('destination');
+      baseSteps.splice(destinationIndex + 1, 0, 'differentContinent');
+    }
+    
+    // Insert duration after endDate only if user didn't select an end date
+    if (formData.wantsEndDate === 'no') {
+      const endDateIndex = baseSteps.indexOf('endDate');
+      baseSteps.splice(endDateIndex + 1, 0, 'duration');
+    }
+    
+    return baseSteps;
+  };
+
+  const handlePreviousStep = () => {
+    const steps = getNextSteps();
+    const currentIndex = steps.indexOf(currentStep);
+    if (currentIndex > 0) {
+      setCurrentStep(steps[currentIndex - 1]);
     }
   };
 
@@ -59,12 +126,482 @@ export default function PlanearPage() {
   };
 
   const clearAllFields = () => {
-    setFormData({ budget: "", category: "" });
-    setDateRange(undefined);
+    setFormData({ 
+      departure: "", 
+      hasDestination: "", 
+      destinationCity: "", 
+      differentContinent: "",
+      travelers: "",
+      wantsStartDate: "",
+      wantsEndDate: "",
+      wantsDuration: "",
+      wantsActivities: "",
+      budget: "" 
+    });
+    setStartDate(new Date());
+    setEndDate(undefined);
+    setDuration(undefined);
+    setSelectedActivities([]);
+    setCurrentStep('departure');
+  };
+
+  const toggleActivity = (activity: string) => {
+    setSelectedActivities(prev => 
+      prev.includes(activity) 
+        ? prev.filter(a => a !== activity)
+        : [...prev, activity]
+    );
+  };
+
+  const getTotalSteps = () => {
+    return getNextSteps().length;
+  };
+
+  const getCurrentStepNumber = () => {
+    const steps = getNextSteps();
+    return steps.indexOf(currentStep) + 1;
+  };
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 'departure':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Where are you departing from?</h2>
+              <p className="text-gray-600">Insert your departure city</p>
+            </div>
+            <Input
+              name="departure"
+              value={formData.departure}
+              onChange={handleChange}
+              placeholder="Type here..."
+              className="text-center text-lg py-6"
+              autoFocus
+            />
+            <Button 
+              onClick={handleNextStep}
+              disabled={!formData.departure}
+              className="w-full py-6 text-lg"
+            >
+              Continue
+            </Button>
+          </div>
+        );
+
+      case 'destination':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Do you have a destination in mind?</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant={formData.hasDestination === 'yes' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, hasDestination: 'yes' }));
+                  setCurrentStep('destinationCity');
+                }}
+                className="py-6 text-lg"
+              >
+                Yes
+              </Button>
+              <Button
+                variant={formData.hasDestination === 'no' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, hasDestination: 'no' }));
+                  setCurrentStep('differentContinent');
+                }}
+                className="py-6 text-lg"
+              >
+                Not really
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'destinationCity':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Which destination city?</h2>
+              <p className="text-gray-600">Enter your desired destination</p>
+            </div>
+            <Input
+              name="destinationCity"
+              value={formData.destinationCity}
+              onChange={handleChange}
+              placeholder="Type destination city..."
+              className="text-center text-lg py-6"
+              autoFocus
+            />
+            <Button 
+              onClick={() => setCurrentStep('travelers')}
+              disabled={!formData.destinationCity}
+              className="w-full py-6 text-lg"
+            >
+              Continue
+            </Button>
+          </div>
+        );
+
+      case 'differentContinent':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Do you want to travel to a different continent?</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant={formData.differentContinent === 'yes' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, differentContinent: 'yes' }));
+                  setCurrentStep('travelers');
+                }}
+                className="py-6 text-lg"
+              >
+                Yes
+              </Button>
+              <Button
+                variant={formData.differentContinent === 'no' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, differentContinent: 'no' }));
+                  setCurrentStep('travelers');
+                }}
+                className="py-6 text-lg"
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'travelers':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">How many people are traveling?</h2>
+              <p className="text-gray-600">Including yourself</p>
+            </div>
+            <Input
+              name="travelers"
+              type="number"
+              min="1"
+              value={formData.travelers}
+              onChange={handleChange}
+              placeholder="Number of travelers..."
+              className="text-center text-lg py-6"
+              autoFocus
+            />
+            <Button 
+              onClick={() => setCurrentStep('startDate')}
+              disabled={!formData.travelers || parseInt(formData.travelers) < 1}
+              className="w-full py-6 text-lg"
+            >
+              Continue
+            </Button>
+          </div>
+        );
+
+      case 'startDate':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Do you want to pick a start date?</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant={formData.wantsStartDate === 'yes' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, wantsStartDate: 'yes' }));
+                }}
+                className="py-6 text-lg"
+              >
+                Yes
+              </Button>
+              <Button
+                variant={formData.wantsStartDate === 'no' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, wantsStartDate: 'no' }));
+                  setStartDate(new Date()); // Set to current date
+                  setCurrentStep('endDate');
+                }}
+                className="py-6 text-lg"
+              >
+                No
+              </Button>
+            </div>
+            
+            {formData.wantsStartDate === 'yes' && (
+              <div className="space-y-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full py-6 text-lg justify-center font-normal",
+                        !startDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-5 w-5" />
+                      {startDate ? format(startDate, "PPP") : "Select start date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Button 
+                  onClick={() => setCurrentStep('endDate')}
+                  disabled={!startDate}
+                  className="w-full py-6 text-lg"
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'endDate':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Do you want to pick an end date?</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant={formData.wantsEndDate === 'yes' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, wantsEndDate: 'yes' }));
+                }}
+                className="py-6 text-lg"
+              >
+                Yes
+              </Button>
+              <Button
+                variant={formData.wantsEndDate === 'no' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, wantsEndDate: 'no' }));
+                  setEndDate(undefined);
+                  // Go to duration step since no end date was selected
+                  setCurrentStep('duration');
+                }}
+                className="py-6 text-lg"
+              >
+                No
+              </Button>
+            </div>
+            
+            {formData.wantsEndDate === 'yes' && (
+              <div className="space-y-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full py-6 text-lg justify-center font-normal",
+                        !endDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-5 w-5" />
+                      {endDate ? format(endDate, "PPP") : "Select end date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={setEndDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Button 
+                  onClick={() => setCurrentStep('activities')}
+                  disabled={!endDate}
+                  className="w-full py-6 text-lg"
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'duration':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Do you want to define a trip duration?</h2>
+              <p className="text-gray-600">In days</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant={formData.wantsDuration === 'yes' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, wantsDuration: 'yes' }));
+                }}
+                className="py-6 text-lg"
+              >
+                Yes
+              </Button>
+              <Button
+                variant={formData.wantsDuration === 'no' ? 'default' : 'outline'}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, wantsDuration: 'no' }));
+                  setDuration(undefined);
+                  setCurrentStep('activities');
+                }}
+                className="py-6 text-lg"
+              >
+                No
+              </Button>
+            </div>
+            
+            {formData.wantsDuration === 'yes' && (
+              <div className="space-y-4">
+                <Input
+                  type="number"
+                  min="1"
+                  value={duration || ''}
+                  onChange={(e) => setDuration(parseInt(e.target.value) || undefined)}
+                  placeholder="Number of days..."
+                  className="text-center text-lg py-6"
+                />
+                <Button 
+                  onClick={() => setCurrentStep('activities')}
+                  disabled={!duration || duration < 1}
+                  className="w-full py-6 text-lg"
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'activities':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Choose activities you're interested in</h2>
+              <p className="text-gray-600">Select 2 or more activities</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
+              {activities.map((activity) => (
+                <Button
+                  key={activity}
+                  variant={selectedActivities.includes(activity) ? "default" : "outline"}
+                  onClick={() => toggleActivity(activity)}
+                  className="py-3 h-auto"
+                >
+                  {activity}
+                </Button>
+              ))}
+            </div>
+            <Button 
+              onClick={() => {
+                setFormData(prev => ({ ...prev, wantsActivities: 'yes' }));
+                setCurrentStep('budget');
+              }}
+              disabled={selectedActivities.length < 2}
+              className="w-full py-6 text-lg"
+            >
+              Continue ({selectedActivities.length} selected)
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setFormData(prev => ({ ...prev, wantsActivities: 'no' }));
+                setSelectedActivities([]);
+                setCurrentStep('budget');
+              }}
+              className="w-full py-6 text-lg"
+            >
+              Skip Activities
+            </Button>
+          </div>
+        );
+
+      case 'budget':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">What's your total budget?</h2>
+              <p className="text-gray-600">For the entire trip</p>
+            </div>
+            <div className="relative">
+              <Input
+                name="budget"
+                type="number"
+                value={formData.budget}
+                onChange={handleChange}
+                placeholder="0.00"
+                className="text-center text-lg py-6 pr-12"
+                autoFocus
+              />
+              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+            </div>
+            <Button 
+              onClick={() => setCurrentStep('summary')}
+              disabled={!formData.budget}
+              className="w-full py-6 text-lg"
+            >
+              Continue
+            </Button>
+          </div>
+        );
+
+      case 'summary':
+        return (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Review Your Trip Plan</h2>
+              <p className="text-gray-600">Confirm all your choices</p>
+            </div>
+            <div className="space-y-4 text-left bg-gray-50 p-4 rounded-lg text-sm">
+              <div><strong>Departure:</strong> {formData.departure}</div>
+              <div><strong>Destination:</strong> {formData.hasDestination === 'yes' ? formData.destinationCity : 'Open to suggestions'}</div>
+              {formData.hasDestination === 'no' && (
+                <div><strong>Different Continent:</strong> {formData.differentContinent === 'yes' ? 'Yes' : 'No'}</div>
+              )}
+              <div><strong>Travelers:</strong> {formData.travelers} people</div>
+              <div><strong>Start Date:</strong> {startDate ? format(startDate, "PPP") : 'Not set'}</div>
+              <div><strong>End Date:</strong> {endDate ? format(endDate, "PPP") : 'Not set'}</div>
+              {formData.wantsEndDate === 'no' && duration && <div><strong>Duration:</strong> {duration} days</div>}
+              {formData.wantsEndDate === 'yes' && startDate && endDate && (
+                <div><strong>Duration:</strong> {differenceInDays(endDate, startDate) + 1} days (calculated)</div>
+              )}
+              <div><strong>Activities:</strong> {selectedActivities.length > 0 ? selectedActivities.join(', ') : 'None selected'}</div>
+              <div><strong>Budget:</strong> €{formData.budget}</div>
+            </div>
+            <Button 
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full py-6 text-lg"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Creating Plan...
+                </>
+              ) : (
+                "Create Trip Plan"
+              )}
+            </Button>
+          </div>
+        );
+    }
   };
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
+    <main className="min-h-screen p-4 bg-gray-50 flex items-center justify-center">
       {/* Custom Success Toast */}
       {showSuccess && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-right duration-300">
@@ -76,164 +613,45 @@ export default function PlanearPage() {
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Planeamento</h1>
-          <Button variant="outline" onClick={() => router.back()}>
-            Voltar
+      <div className="w-full max-w-md">
+        {/* Progress Bar */}
+        <div className="flex justify-between items-center mb-8">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={handlePreviousStep}
+            disabled={currentStep === 'departure'}
+            className="flex-shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          
+          <div className="flex-1 mx-4">
+            <div className="flex justify-between text-sm text-gray-500 mb-2">
+              <span>Step {getCurrentStepNumber()} of {getTotalSteps()}</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(getCurrentStepNumber() / getTotalSteps()) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={clearAllFields}
+            className="flex-shrink-0"
+          >
+            <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Criar Novo Plano</CardTitle>
-            <CardDescription>
-              Configure os parametros principais do seu plano.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Budget - First Field with Clear Button */}
-              <div className="space-y-2">
-                <Label htmlFor="budget">Orçamento (€)</Label>
-                <div className="relative">
-                  <Input
-                    id="budget"
-                    name="budget"
-                    type="number"
-                    value={formData.budget}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    required
-                    className="pr-10"
-                  />
-                  {formData.budget && (
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, budget: "" }))}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Category Dropdown with Clear Button */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="category">Categoria</Label>
-                    {formData.category && (
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, category: "" }))}
-                        className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
-                      >
-                        <X className="h-3 w-3" />
-                        Limpar
-                      </button>
-                    )}
-                  </div>
-                  <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecionar categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category.toLowerCase()}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Date Range Picker with Clear Button */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label>Período da Viagem</Label>
-                    {dateRange && (
-                      <button
-                        type="button"
-                        onClick={() => setDateRange(undefined)}
-                        className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
-                      >
-                        <X className="h-3 w-3" />
-                        Limpar
-                      </button>
-                    )}
-                  </div>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !dateRange && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange?.from ? (
-                          dateRange.to ? (
-                            <>
-                              {format(dateRange.from, "dd/MM/yy")} - {format(dateRange.to, "dd/MM/yy")}
-                            </>
-                          ) : (
-                            format(dateRange.from, "dd/MM/yy")
-                          )
-                        ) : (
-                          <span>Selecionar período</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        numberOfMonths={2}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-
-              {/* Submit Buttons */}
-              <div className="flex gap-4 pt-4">
-                <Button 
-                  type="submit" 
-                  className="flex-1"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      A processar...
-                    </>
-                  ) : (
-                    "Criar Plano"
-                  )}
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={clearAllFields}
-                  disabled={(!formData.budget && !formData.category && !dateRange) || isSubmitting}
-                >
-                  Limpar Tudo
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => router.back()}
-                  disabled={isSubmitting}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
+        {/* Step Content Card */}
+        <Card className="min-h-[500px] flex flex-col">
+          <CardContent className="flex-1 flex items-center justify-center p-6">
+            {renderStepContent()}
           </CardContent>
         </Card>
       </div>
