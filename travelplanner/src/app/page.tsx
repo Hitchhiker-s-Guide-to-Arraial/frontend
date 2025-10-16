@@ -2,6 +2,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Link from 'next/link';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -41,8 +42,33 @@ export default function Home() {
             Sign Out
           </button>
         </div>
-        <p className="text-gray-600">You are successfully logged in!</p>
-        <p className="text-gray-600 mt-2">Email: {session.user?.email}</p>
+
+        
+        <div className="flex flex-col bg-gray-400">
+          <div className="h-56 bg-gray-600">
+            Banner
+          </div>
+
+          <div className="flex justify-center mt-4 p-4"> {/* Changed to justify-center instead of flex-row */}
+            <div className="flex gap-4 w-full max-w-2xl"> {/* Container with max width and gap */}
+              <div className="flex-1">
+                <Link href="/planear" className="block">
+                <button className="w-full bg-blue-500 text-white rounded-lg py-3 px-4 hover:bg-blue-600 transition shadow-md">
+                  Planear
+                </button>
+                </Link>
+              </div>
+
+              <div className="flex-1">
+                <Link href="/gerir" className="block">
+                <button className="w-full bg-green-500 text-white rounded-lg py-3 px-4 hover:bg-green-600 transition shadow-md">
+                  Gerir
+                </button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
