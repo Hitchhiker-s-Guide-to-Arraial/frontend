@@ -75,130 +75,130 @@ export default function RecsPage() {
     }, 1500); // Simulate loading time
   };
 
-  const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] => {
-    // This is where you would integrate with your actual backend/LLM
-    // For now, we'll simulate personalized recommendations based on the trip data
-    
-    const baseRecommendations = [
-      {
-        id: 1,
-        name: "Cultural City Escape",
-        description: `Perfect for ${tripData.travelers} travelers from ${tripData.departure} looking for ${tripData.activities.join(', ')}`,
-        location: tripData.destination !== 'flexible' ? tripData.destination : "Lisbon, Portugal",
-        estimatedCost: tripData.budget * 0.8,
-        bestSeason: "Spring/Fall",
-        activities: tripData.activities.slice(0, 3),
-        matchScore: 95,
-        slug: "cultural-escape"
-      },
-      {
-        id: 2,
-        name: "Adventure Getaway",
-        description: `Tailored for your ${tripData.duration || 7}-day trip with focus on ${tripData.activities[0] || 'adventure'}`,
-        location: tripData.differentContinent ? "Bali, Indonesia" : "Algarve, Portugal",
-        estimatedCost: tripData.budget * 0.6,
-        bestSeason: "Summer",
-        activities: ["Adventure Sports", "Nature", ...tripData.activities.filter(a => a !== 'Adventure Sports')],
-        matchScore: 88,
-        slug: "adventure-getaway"
-      },
-      {
-        id: 3,
-        name: "Relaxing Beach Retreat",
-        description: `Ideal ${tripData.travelStyle} vacation from ${tripData.departure} within your €${tripData.budget} budget`,
-        location: "Algarve, Portugal",
-        estimatedCost: tripData.budget * 0.7,
-        bestSeason: "Summer",
-        activities: ["Beach", "Relaxation", "Food & Dining"],
-        matchScore: 82,
-        slug: "beach-retreat"
-      },
-      {
-        id: 4,
-        name: "Mountain Exploration",
-        description: `Based on your interest in ${tripData.activities.join(' and ')} for ${tripData.travelers} people`,
-        location: "Serra da Estrela, Portugal",
-        estimatedCost: tripData.budget * 0.5,
-        bestSeason: "All Year",
-        activities: ["Hiking", "Nature", "Photography"],
-        matchScore: 78,
-        slug: "mountain-exploration"
-      },
-      {
-        id: 5,
-        name: "Historic Tour",
-        description: `Cultural journey perfect for your ${tripData.duration || 5}-day itinerary`,
-        location: "Porto, Portugal",
-        estimatedCost: tripData.budget * 0.9,
-        bestSeason: "Spring/Fall",
-        activities: ["City Tours", "Museums", "Cultural Events"],
-        matchScore: 85,
-        slug: "historic-tour"
-      }
-    ];
+const getPersonalizedRecommendations = (tripData: TripData): Recommendation[] => {
+  // This is where you would integrate with your actual backend/LLM
+  // For now, we'll simulate personalized recommendations based on the trip data
+  
+  const baseRecommendations = [
+    {
+      id: 1,
+      name: "Cultural City Escape",
+      description: `Perfect for ${tripData.travelers} travelers from ${tripData.departure} looking for ${tripData.activities.join(', ')}`,
+      location: tripData.destination !== 'flexible' ? tripData.destination : "Lisbon, Portugal",
+      estimatedCost: tripData.budget * 0.8,
+      bestSeason: "Spring/Fall",
+      activities: tripData.activities.slice(0, 3),
+      matchScore: 95,
+      slug: "rec-1" // Fixed slug
+    },
+    {
+      id: 2,
+      name: "Adventure Getaway",
+      description: `Tailored for your ${tripData.duration || 7}-day trip with focus on ${tripData.activities[0] || 'adventure'}`,
+      location: tripData.differentContinent ? "Bali, Indonesia" : "Algarve, Portugal",
+      estimatedCost: tripData.budget * 0.6,
+      bestSeason: "Summer",
+      activities: ["Adventure Sports", "Nature", ...tripData.activities.filter(a => a !== 'Adventure Sports')],
+      matchScore: 88,
+      slug: "rec-2" // Fixed slug
+    },
+    {
+      id: 3,
+      name: "Relaxing Beach Retreat",
+      description: `Ideal ${tripData.travelStyle} vacation from ${tripData.departure} within your €${tripData.budget} budget`,
+      location: "Algarve, Portugal",
+      estimatedCost: tripData.budget * 0.7,
+      bestSeason: "Summer",
+      activities: ["Beach", "Relaxation", "Food & Dining"],
+      matchScore: 82,
+      slug: "rec-3" // Fixed slug
+    },
+    {
+      id: 4,
+      name: "Mountain Exploration",
+      description: `Based on your interest in ${tripData.activities.join(' and ')} for ${tripData.travelers} people`,
+      location: "Serra da Estrela, Portugal",
+      estimatedCost: tripData.budget * 0.5,
+      bestSeason: "All Year",
+      activities: ["Hiking", "Nature", "Photography"],
+      matchScore: 78,
+      slug: "rec-4" // Fixed slug
+    },
+    {
+      id: 5,
+      name: "Historic Tour",
+      description: `Cultural journey perfect for your ${tripData.duration || 5}-day itinerary`,
+      location: "Porto, Portugal",
+      estimatedCost: tripData.budget * 0.9,
+      bestSeason: "Spring/Fall",
+      activities: ["City Tours", "Museums", "Cultural Events"],
+      matchScore: 85,
+      slug: "rec-5" // Fixed slug
+    }
+  ];
 
-    return baseRecommendations;
-  };
+  return baseRecommendations;
+};
 
-  const getGenericRecommendations = (): Recommendation[] => {
-    return [
-      {
-        id: 1,
-        name: "Beach Paradise",
-        description: "Relaxing beach vacation with stunning ocean views",
-        location: "Algarve, Portugal",
-        estimatedCost: 1200,
-        bestSeason: "Summer",
-        activities: ["Beach", "Swimming", "Relaxation"],
-        matchScore: 75,
-        slug: "beach-paradise"
-      },
-      {
-        id: 2,
-        name: "City Explorer",
-        description: "Urban adventure through historic city centers",
-        location: "Lisbon, Portugal",
-        estimatedCost: 1500,
-        bestSeason: "Spring/Fall",
-        activities: ["City Tours", "Museums", "Food & Dining"],
-        matchScore: 70,
-        slug: "city-explorer"
-      },
-      {
-        id: 3,
-        name: "Mountain Retreat",
-        description: "Peaceful getaway in the mountains",
-        location: "Serra da Estrela, Portugal",
-        estimatedCost: 800,
-        bestSeason: "All Year",
-        activities: ["Hiking", "Nature", "Photography"],
-        matchScore: 65,
-        slug: "mountain-retreat"
-      },
-      {
-        id: 4,
-        name: "Cultural Journey",
-        description: "Immerse yourself in local culture and traditions",
-        location: "Porto, Portugal",
-        estimatedCost: 1100,
-        bestSeason: "Spring/Fall",
-        activities: ["Cultural Events", "Museums", "Food & Dining"],
-        matchScore: 72,
-        slug: "cultural-journey"
-      },
-      {
-        id: 5,
-        name: "Adventure Seekers",
-        description: "Thrilling activities for the adventurous soul",
-        location: "Azores, Portugal",
-        estimatedCost: 1800,
-        bestSeason: "Summer",
-        activities: ["Adventure Sports", "Hiking", "Nature"],
-        matchScore: 68,
-        slug: "adventure-seekers"
-      }
-    ];
-  };
+ const getGenericRecommendations = (): Recommendation[] => {
+  return [
+    {
+      id: 1,
+      name: "Beach Paradise",
+      description: "Relaxing beach vacation with stunning ocean views",
+      location: "Algarve, Portugal",
+      estimatedCost: 1200,
+      bestSeason: "Summer",
+      activities: ["Beach", "Swimming", "Relaxation"],
+      matchScore: 75,
+      slug: "rec-1" // Fixed slug
+    },
+    {
+      id: 2,
+      name: "City Explorer",
+      description: "Urban adventure through historic city centers",
+      location: "Lisbon, Portugal",
+      estimatedCost: 1500,
+      bestSeason: "Spring/Fall",
+      activities: ["City Tours", "Museums", "Food & Dining"],
+      matchScore: 70,
+      slug: "rec-2" // Fixed slug
+    },
+    {
+      id: 3,
+      name: "Mountain Retreat",
+      description: "Peaceful getaway in the mountains",
+      location: "Serra da Estrela, Portugal",
+      estimatedCost: 800,
+      bestSeason: "All Year",
+      activities: ["Hiking", "Nature", "Photography"],
+      matchScore: 65,
+      slug: "rec-3" // Fixed slug
+    },
+    {
+      id: 4,
+      name: "Cultural Journey",
+      description: "Immerse yourself in local culture and traditions",
+      location: "Porto, Portugal",
+      estimatedCost: 1100,
+      bestSeason: "Spring/Fall",
+      activities: ["Cultural Events", "Museums", "Food & Dining"],
+      matchScore: 72,
+      slug: "rec-4" // Fixed slug
+    },
+    {
+      id: 5,
+      name: "Adventure Seekers",
+      description: "Thrilling activities for the adventurous soul",
+      location: "Azores, Portugal",
+      estimatedCost: 1800,
+      bestSeason: "Summer",
+      activities: ["Adventure Sports", "Hiking", "Nature"],
+      matchScore: 68,
+      slug: "rec-5" // Fixed slug
+    }
+  ];
+};
 
   // Full page loading splash for navigation
   if (isNavigating) {
