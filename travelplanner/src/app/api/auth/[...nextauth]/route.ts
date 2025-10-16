@@ -2,8 +2,6 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 
-console.log("🔍 REGISTER - Initial users:", db.users);
-console.log("🔍 REGISTER - Array memory location:", db.users);
 
 const handler = NextAuth({
   providers: [
