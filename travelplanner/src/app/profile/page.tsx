@@ -231,16 +231,6 @@ export default function ProfilePage() {
                               <Sparkles className="h-4 w-4" />
                               Get Recommendations
                             </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                // Optional: Add edit functionality later
-                                console.log('Edit trip:', trip.id);
-                              }}
-                            >
-                              View Details
-                            </Button>
                           </div>
                         </div>
                       </CardContent>
