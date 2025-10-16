@@ -1,70 +1,36 @@
 "use client";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-// ✅ Helper: Hash password using SHA-256 (same as in register page)
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
-   try {
-      // ✅ Hash password before sending
-      const hashedPassword = await hashPassword(password);
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-      // ✅ Send credentials to backend /api/login
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password: hashedPassword, // hashed version
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Invalid email or password");
-      }
-
-      // ✅ Optionally save token to localStorage or cookie
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
-
-      // ✅ Redirect after successful login
+    if (result?.error) {
+      setError("Invalid email or password");
+    } else {
       router.push("/");
-    } catch (err) {
-      console.error("Login error:", err);
-      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen w-full flex bg-gray-100">
-      {/* Left column: form */}
+      {/* Coluna esquerda: formulário */}
       <div className="w-full lg:w-[45%] relative flex flex-col justify-center items-center px-8 lg:px-20 bg-white">
-        {/* Logo */}
+        {/* --- LOGÓTIPO --- */}
         <div
           className="
             absolute 
@@ -128,13 +94,12 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={isLoading}
             className="w-full bg-[#1E66FF] text-white py-2.5 px-4 rounded-md hover:bg-[#1557E5] transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            Sign in
           </button>
 
-          {/* Divider “or” */}
+          {/* Linha “or” */}
           <div className="flex items-center my-6">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-3 text-gray-500 text-sm">or</span>
@@ -150,7 +115,7 @@ export default function LoginPage() {
         </form>
       </div>
 
-      {/* Right column: image */}
+      {/* Coluna direita: imagem */}
       <div className="hidden lg:block w-[60%] relative">
         <div
           className="absolute inset-0 bg-cover bg-center"
