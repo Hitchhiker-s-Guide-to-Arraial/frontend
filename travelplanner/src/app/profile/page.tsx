@@ -226,7 +226,7 @@ export default function ProfilePage() {
                           <div className="flex flex-col gap-2 items-end">
                             <Button 
                               onClick={() => getRecommendationsForTrip(trip)}
-                              className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600"
+                              className="flex items-center gap-2 bg-[#1e66ff] hover:bg-[#4a75d2]"
                             >
                               <Sparkles className="h-4 w-4" />
                               Get Recommendations
@@ -250,7 +250,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button onClick={() => router.push("/planear")} className="py-4">
+              <Button onClick={() => router.push("/planear")} className="py-4 bg-[#1e66ff]">
                 Create New Trip
               </Button>
               <Button variant="outline" onClick={() => router.push("/gerir")} className="py-4">
