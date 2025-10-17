@@ -10,45 +10,40 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("🔐 Login attempt for email:", credentials?.email);
+        if (!credentials?.email || !credentials?.password) return null;
 
-        if (!credentials?.email || !credentials?.password) {
-          console.log("❌ Missing credentials");
-          return null;
-        }
+        // 1) Get OAuth2 access token via /token (form-encoded)
+        const tokenRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/token`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            username: credentials.email,
+            password: credentials.password,
+          }),
+        });
 
-        try {
-          // ✅ Call your backend /api/login
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email: credentials.email,
-                password: credentials.password,
-              }),
-            }
-          );
+        if (!tokenRes.ok) return null;
+        const tokenJson = await tokenRes.json();
+        const accessToken: string | undefined = tokenJson?.access_token;
 
-          const data = await response.json();
-          console.log("📩 Backend response:", data);
+        if (!accessToken) return null;
 
-          if (!response.ok || !data?.success) {
-            console.log("❌ Backend rejected login:", data?.error);
-            return null;
-          }
+        // 2) Fetch user info from /me using the bearer token
+        const meRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          cache: "no-store",
+        });
 
-          // ✅ Return the user object for the session
-          return {
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.name,
-          };
-        } catch (error) {
-          console.error("🚨 Login error:", error);
-          return null;
-        }
+        if (!meRes.ok) return null;
+        const me = await meRes.json();
+
+        // 3) Return the user object; keep token to persist in JWT
+        return {
+          id: String(me.id),
+          name: me.name,
+          email: me.email,
+          accessToken, // will be copied into JWT in callbacks.jwt
+        };
       },
     }),
   ],
@@ -61,18 +56,21 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
+        token.id = user.id as string;
+        token.email = user.email as string;
+        token.name = user.name as string;
+        token.accessToken = (user as any).accessToken as string;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
+      if (session.user) {
         session.user.id = token.id as string;
-        session.user.email = token.email;
-        session.user.name = token.name;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
+      // @ts-expect-error - expose backend token for client/API calls
+      session.accessToken = (token as any).accessToken as string | undefined;
       return session;
     },
   },
