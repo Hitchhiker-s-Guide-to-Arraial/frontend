@@ -186,7 +186,18 @@ export default function RecsPage() {
           {recommendations.map((rec) => (
             <Link
               key={rec.id}
-              href={`/recs/${rec.slug}`}
+              href={{
+                pathname: `/recs/${rec.slug}`,
+                query: {
+                  name: rec.name,
+                  description: rec.description,
+                  location: rec.location,
+                  estimatedCost: rec.estimatedCost,
+                  bestSeason: rec.bestSeason,
+                  activities: JSON.stringify(rec.activities),
+                  matchScore: rec.matchScore
+                }
+              }}
               className="group block bg-white rounded-2xl shadow-md hover:shadow-lg transition overflow-hidden"
             >
               {/* imagem com cantos superiores arredondados e altura ligeiramente maior */}

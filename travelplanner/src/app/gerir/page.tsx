@@ -15,6 +15,13 @@ interface SavedRecommendation {
   activities: string[];
   matchScore: number;
   slug: string;
+  // ADD PRICING DATA:
+  pricing?: {
+    flights: number;
+    activities: number;
+    stay: number;
+    meals: number;
+  };
   // Additional fields from when it was saved
   departure?: string;
   travelers?: string;
