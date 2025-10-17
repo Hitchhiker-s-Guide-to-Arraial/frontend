@@ -1,0 +1,95 @@
+{
+  "destinations": [
+    {
+      "destination": "Paris, France",
+      "image": "https://img.freepik.com/fotos-gratis/bela-foto-ampla-da-torre-eiffel-em-paris-rodeada-de-agua-com-navios-sob-o-ceu-colorido_181624-5118.jpg?semt=ais_hybrid&w=740&q=80",
+      "flight_price": 533,
+      "flight_link": "https://www.skyscanner.pt/transporte/voos/lis/pari/251027/251031/config/13577-2510270715--32356-0-10413-2510271055%7C10413-2510312135--32356-0-13577-2510312315?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+      "average_meals_price": 30,
+      "activities_price": 200,
+      "hotel": {
+        "name": "ibis Paris Bastille Opera",
+        "link": "https://www.booking.com/hotel/fr/paris-bastille-opera.pt-pt.html?aid=356980&label=gog235jc-10CAsoTUIUcGFyaXMtYmFzdGlsbGUtb3BlcmFIH1gDaLsBiAEBmAEzuAEXyAEM2AED6AEB-AEBiAIBqAIBuALHh8nHBsACAdICJGE4NjExOWY2LWY5OTMtNDJlNC1hYTAwLWUwMDhkODIzNmIyY9gCAeACAQ&sid=690dc62e0e679bf15b57177ccf3a1636&all_sr_blocks=54544504_94489708_2_2_0&checkin=2025-10-27&checkout=2025-10-31&dest_id=-1456928&dest_type=city&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=54544504_94489708_2_2_0&hpos=1&matching_block_id=54544504_94489708_2_2_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=54544504_94489708_2_2_0__63856&srepoch=1760707588&srpvid=e19b5e7b17e202a9&type=total&ucfs=1&",
+        "price": 649
+      },
+      "price_total": 1402,
+      "travelers": 2
+    },
+    {
+      "destination": "Madrid, Spain",
+      "image": "https://img.freepik.com/fotos-gratis/palacio-de-cibeles-e-fonte-na-plaza-de-cibeles-em-madrid-espanha_268835-1304.jpg?semt=ais_hybrid&w=740&q=80",
+      "flight_price": 336,
+      "flight_link": "https://www.skyscanner.pt/transporte/voos/lis/mad/251027/251031/config/13577-2510270705--32356-0-13870-2510270925%7C13870-2510312210--32356-0-13577-2510312235?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+      "meals_price": 30,
+      "activities_price": 150,
+      "hotel": {
+        "name": "Hostal Central Palace Madrid",
+        "link": "https://www.booking.com/hotel/es/hostal-central-palace-madrid.pt-pt.html?aid=356980&label=gog235jc-10CAsoTUIUcGFyaXMtYmFzdGlsbGUtb3BlcmFIH1gDaLsBiAEBmAEzuAEXyAEM2AED6AEB-AEBiAIBqAIBuALHh8nHBsACAdICJGE4NjExOWY2LWY5OTMtNDJlNC1hYTAwLWUwMDhkODIzNmIyY9gCAeACAQ&sid=9bf583795807d3004756099e0a7b046d&all_sr_blocks=36374814_371091600_2_2_0&checkin=2025-10-27&checkout=2025-10-31&dest_id=363748&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=36374814_371091600_2_2_0&hpos=1&matching_block_id=36374814_371091600_2_2_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=36374814_371091600_2_2_0__97838&srepoch=1760708068&srpvid=694a5f6bc88d062a&type=total&ucfs=1&",
+        "price": 978
+      },
+      "price_total": 1494,
+      "travelers": 2
+    },
+    {
+      "destination": "Rome, Italy",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRi1omkNzuPW2KPP7vHxkcWSuSX1eL7qc-BZw&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",
+      "flight_price": 509,
+      "flight_link": "https://www.skyscanner.pt/transporte/voos/lis/rome/251027/251031/config/13577-2510270840--30596-0-11493-2510271305%7C11493-2510311835--30596-0-13577-2510312050?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+      "meals_price": 35,
+      "activities_price": 170,
+      "hotel": {
+        "name": "Hotel Impero",
+        "link": "booking.com/hotel/it/impero.pt-pt.html?label=italia-roma-88jfNAoBm9KK9euENfaejwS467115948452%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atiaud-2382347442888%3Akwd-345587118%3Alp1011767%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YU5pXiVhsEsYvo03y-EPNDM&sid=690dc62e0e679bf15b57177ccf3a1636&gclid=CjwKCAjw0sfHBhB6EiwAQtv5qeio5YsEkDSMNdBVgWw9cq9UBLoZ0qlagaWv1dRZOfUbIUE5WJQpchoCD9oQAvD_BwE&aid=311098&ucfs=1&arphpl=1&checkin=2025-10-27&checkout=2025-10-31&dest_id=-126693&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=2&hapos=2&sr_order=popularity&srpvid=977b61347b371045&srepoch=1760709001&all_sr_blocks=8549608_0_2_0_0&highlighted_blocks=8549608_0_2_0_0&matching_block_id=8549608_0_2_0_0&sr_pri_blocks=8549608_0_2_0_0__77869&from=searchresults",
+        "price": 779
+      },
+      "price_total": 1483,
+      "travelers": 2
+    },
+    {
+      "destination": "Nice, France",
+      "image": "https://lp-cms-production.imgix.net/2023-02/3cb45f6e59190e8213ce0a35394d0e11-nice.jpg?sharp=10&vib=20&w=1200&w=600&h=400",
+      "flight_price": 465,
+      "flight_link": "https://www.skyscanner.pt/transporte/voos/lis/nce/251027/251031/config/13577-2510271210--32356-0-14581-2510271535%7C14581-2510312115--32356-0-13577-2510312255?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+      "meals_price": 40,
+      "activities_price": 140,
+      "hotel": {
+        "name": "Hotel de la Fontaine",
+        "link": "https://www.booking.com/hotel/fr/de-la-fontaine.en-gb.html",
+        "price": 190
+      },
+      "hotels_price": 190,
+      "price_total": 590,
+      "travelers": 1
+    },
+    {
+      "destination": "Cracóvia, Polónia",
+      "image": "https://q-xx.bstatic.com/xdata/images/landmark/1680x840/253921.webp?k=14b29e9d30f8b43f37587c239b8420f24775a0025fc96b5e1d5a90c31425e92a&o=",
+      "flight_price": 691,
+      "flight_link": "https://www.skyscanner.pt/transporte/voos/lis/krk/251027/251031/config/13577-2510270925--32356-1-13235-2510271640%7C13235-2510311820--31915-0-13577-2510312130?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+      "meals_price": 24,
+      "activities_price": 120,
+      "hotel": {
+        "name": "PURO Kraków Kazimierz",
+        "link": "https://www.booking.com/hotel/pl/puro-krakow-kazimierz.pt-pt.html?aid=2276664&label=msn-lDy48d8R122_J81eFyHW9g-79989670528854%3Atikwd-79989825046349%3Aloc-152%3Aneo%3Amte%3Alp137767%3Adec%3AqsPURO%20Krak%C3%B3w%20Kazimierz&sid=47ad98d3ab164ae5e1a1cd6b550082b4&all_sr_blocks=317054609_0_2_0_0&checkin=2025-10-27&checkout=2025-10-31&dest_id=-510625&dest_type=city&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=317054609_0_2_0_0&hpos=1&matching_block_id=317054609_0_2_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=317054609_0_2_0_0__256991&srepoch=1760709924&srpvid=9f5f6310250d052f&type=total&ucfs=1&",
+        "price": 605
+      },
+      "price_total": 1320,
+      "travelers": 2
+    },
+    {
+      "destination": "Atenas, Grécia",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmiOTQliJ4acArxtyJM3gAoh4NH7MgMu5Yrg&s",
+      "flight_price": 496,
+      "flight_link": "https://www.skyscanner.pt/transporte/voos/lis/ath/251027/251031/config/13577-2510271710--32756-0-9592-2510272305%7C9592-2510312000--31869-0-13577-2510312230?adultsv2=2&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+      "meals_price": 30,
+      "activities_price": 180,
+      "hotel": {
+        "name": "Titania Hotel",
+        "link": "https://www.booking.com/hotel/gr/titania.pt-pt.html?aid=311098&label=hotel-95631-gr-Ft92iUJigD7T4W6KKj5iXAS161695421442%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atiaud-2382347442888%3Akwd-301327732021%3Alp1011767%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YU5pXiVhsEsYvo03y-EPNDM&sid=690dc62e0e679bf15b57177ccf3a1636&age=1&all_sr_blocks=9728103_0_2_1_0&checkin=2025-10-27&checkout=2025-10-31&dest_id=-814876&dest_type=city&dist=0&group_adults=2&group_children=0&hapos=4&highlighted_blocks=9728103_0_2_1_0&hpos=4&matching_block_id=9728103_0_2_1_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=9728103_0_2_1_0__45739&srepoch=1760710004&srpvid=232763256aba0531&type=total&ucfs=1&",
+        "price": 457
+      },
+      "price_total": 1163,
+      "travelers": 2
+    }
+  ]
+}

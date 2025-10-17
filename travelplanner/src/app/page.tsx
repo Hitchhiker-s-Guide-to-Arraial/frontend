@@ -72,29 +72,27 @@ export default function Home() {
 
       {/* BANNER com o mesmo comportamento do anterior */}
       <section className="w-full max-w-6xl px-4 mt-6">
-        <div
-          className="relative rounded-2xl overflow-hidden shadow-md bg-gray-200"
-          style={{ height: "24rem" }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.6 }}
-              className="absolute inset-0"
-            >
-              <Image
-                src={slides[currentSlide].src}
-                alt={slides[currentSlide].alt}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 1024px"
-                className="object-cover"
-              />
-            </motion.div>
-          </AnimatePresence>
+  <div className="relative rounded-2xl overflow-hidden" style={{ height: "24rem" }}>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={currentSlide}
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -100 }}
+        transition={{ duration: 0.6 }}
+        className="absolute inset-0"
+      >
+        <Image
+          src={slides[currentSlide].src}
+          alt={slides[currentSlide].alt}
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 1024px"
+          className="object-cover rounded-2xl"
+        />
+      </motion.div>
+    </AnimatePresence>
+
 
           {/* Dots */}
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
