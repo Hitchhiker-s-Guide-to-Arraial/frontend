@@ -22,19 +22,6 @@ interface SavedRecommendation {
     stay: number;
     meals: number;
   };
-  // JSON-specific data
-  jsonData?: {
-    flight_link: string;
-    hotel: {
-      name: string;
-      link: string;
-      price: number;
-    };
-    image: string;
-    flight_price: number;
-    meals_price: number;
-    activities_price: number;
-  };
   // Additional fields from when it was saved
   departure?: string;
   travelers?: string;
@@ -43,44 +30,15 @@ interface SavedRecommendation {
   savedAt: Date;
 }
 
-interface JsonDestination {
-  destination: string;
-  image: string;
-  flight_price: number;
-  flight_link: string;
-  meals_price: number;
-  average_meals_price: number;
-  activities_price: number;
-  hotel: {
-    name: string;
-    link: string;
-    price: number;
-  };
-  price_total: number;
-  travelers: number;
-}
-
 export default function GerirPage() {
   const { data: session } = useSession();
   const userName = session?.user?.name || "User";
   const [savedRecommendations, setSavedRecommendations] = useState<SavedRecommendation[]>([]);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
-  const [jsonData, setJsonData] = useState<JsonDestination[]>([]);
 
   useEffect(() => {
     loadSavedRecommendations();
-    fetchJsonData();
   }, []);
-
-  const fetchJsonData = async () => {
-    try {
-      const response = await fetch('/without_destination 1.json');
-      const data = await response.json();
-      setJsonData(data.destinations || []);
-    } catch (error) {
-      console.error('Error fetching JSON data:', error);
-    }
-  };
 
   const loadSavedRecommendations = () => {
     const saved = localStorage.getItem('savedRecommendations');
@@ -91,55 +49,13 @@ export default function GerirPage() {
         const validRecommendations = parsed.filter((rec: any) => 
           rec && rec.id && rec.name && rec.location
         );
-        
-        // Enhance saved recommendations with JSON data if available
-        const enhancedRecommendations = validRecommendations.map((rec: SavedRecommendation) => {
-          // Try to find matching JSON data
-          const matchingJson = jsonData.find(jsonDest => 
-            jsonDest.destination.toLowerCase().includes(rec.name.toLowerCase()) ||
-            rec.location.toLowerCase().includes(jsonDest.destination.toLowerCase())
-          );
-
-          if (matchingJson) {
-            return {
-              ...rec,
-              // Update pricing data from JSON
-              pricing: {
-                flights: matchingJson.flight_price,
-                activities: matchingJson.activities_price,
-                stay: matchingJson.hotel.price,
-                meals: matchingJson.meals_price || matchingJson.average_meals_price
-              },
-              // Ensure JSON data is included
-              jsonData: {
-                flight_link: matchingJson.flight_link,
-                hotel: matchingJson.hotel,
-                image: matchingJson.image,
-                flight_price: matchingJson.flight_price,
-                meals_price: matchingJson.meals_price || matchingJson.average_meals_price,
-                activities_price: matchingJson.activities_price
-              },
-              // Update estimated cost from JSON
-              estimatedCost: matchingJson.price_total
-            };
-          }
-          return rec;
-        });
-
-        setSavedRecommendations(enhancedRecommendations);
+        setSavedRecommendations(validRecommendations);
       } catch (error) {
         console.error('Error loading saved recommendations:', error);
         setSavedRecommendations([]);
       }
     }
   };
-
-  // Reload recommendations when JSON data is loaded
-  useEffect(() => {
-    if (jsonData.length > 0) {
-      loadSavedRecommendations();
-    }
-  }, [jsonData]);
 
   const removeRecommendation = (recommendationId: string) => {
     const updatedRecommendations = savedRecommendations.filter(rec => rec.id !== recommendationId);
@@ -154,17 +70,6 @@ export default function GerirPage() {
 
   const handleImageError = (recommendationId: string, imageSrc: string) => {
     setFailedImages(prev => new Set(prev).add(imageSrc));
-  };
-
-  // Get image source with JSON data fallback
-  const getImageSrc = (recommendation: SavedRecommendation) => {
-    // First try JSON data image
-    if (recommendation.jsonData?.image && !failedImages.has(recommendation.jsonData.image)) {
-      return recommendation.jsonData.image;
-    }
-    
-    // Then try placeholder logic
-    return getPlaceholderImage(recommendation);
   };
 
   // Safe function to get location with fallback
@@ -230,16 +135,8 @@ export default function GerirPage() {
     return recommendation?.name || 'Unnamed Trip';
   };
 
-  // Safe function to get estimated cost - prioritize JSON data
+  // Safe function to get estimated cost
   const getSafeCost = (recommendation: SavedRecommendation) => {
-    if (recommendation.jsonData) {
-      const total = 
-        (recommendation.jsonData.flight_price || 0) +
-        (recommendation.jsonData.activities_price || 0) +
-        (recommendation.jsonData.hotel?.price || 0) +
-        (recommendation.jsonData.meals_price || 0);
-      return total || recommendation?.estimatedCost || 0;
-    }
     return recommendation?.estimatedCost || 0;
   };
 
@@ -251,11 +148,6 @@ export default function GerirPage() {
   // Safe function to get activities
   const getSafeActivities = (recommendation: SavedRecommendation) => {
     return recommendation?.activities || [];
-  };
-
-  // Get hotel name from JSON data
-  const getHotelName = (recommendation: SavedRecommendation) => {
-    return recommendation.jsonData?.hotel?.name || 'Hotel';
   };
 
   return (
@@ -327,7 +219,7 @@ export default function GerirPage() {
             </div>
           ) : (
             savedRecommendations.map((recommendation) => {
-              const imageSrc = getImageSrc(recommendation);
+              const imageSrc = getPlaceholderImage(recommendation);
               const gradient = getGradientColor(recommendation);
               
               return (
@@ -377,11 +269,6 @@ export default function GerirPage() {
                         <span>💰 €{getSafeCost(recommendation)}</span>
                         <span>⭐ {getSafeMatchScore(recommendation)}% match</span>
                       </div>
-                      {recommendation.jsonData?.hotel && (
-                        <div className="mt-1 text-xs text-gray-500">
-                          Stay: {getHotelName(recommendation)}
-                        </div>
-                      )}
                       {getSafeActivities(recommendation).length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {getSafeActivities(recommendation).slice(0, 2).map((activity, index) => (

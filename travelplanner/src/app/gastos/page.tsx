@@ -33,38 +33,6 @@ interface SavedRecommendation {
   isFinished?: boolean;
   finishedAt?: Date;
   savedAt: Date;
-  // JSON-specific data
-  jsonData?: {
-    flight_link: string;
-    hotel: {
-      name: string;
-      link: string;
-      price: number;
-    };
-    image: string;
-    flight_price: number;
-    meals_price: number;
-    activities_price: number;
-  };
-  activitiesList?: ListItem[];
-  mealsList?: ListItem[];
-}
-
-interface JsonDestination {
-  destination: string;
-  image: string;
-  flight_price: number;
-  flight_link: string;
-  meals_price: number;
-  average_meals_price: number;
-  activities_price: number;
-  hotel: {
-    name: string;
-    link: string;
-    price: number;
-  };
-  price_total: number;
-  travelers: number;
 }
 
 export default function GastosPage() {
@@ -79,7 +47,6 @@ function GastosContent() {
   const searchParams = useSearchParams();
   const tripId = searchParams.get('trip');
   const [trip, setTrip] = useState<SavedRecommendation | null>(null);
-  const [jsonData, setJsonData] = useState<JsonDestination[]>([]);
   const [estimatedCosts, setEstimatedCosts] = useState<TripPricing>({
     flights: 300,
     activities: 150,
@@ -112,19 +79,8 @@ function GastosContent() {
   useEffect(() => {
     if (tripId) {
       loadTripData();
-      fetchJsonData();
     }
   }, [tripId]);
-
-  const fetchJsonData = async () => {
-    try {
-      const response = await fetch('/without_destination 1.json');
-      const data = await response.json();
-      setJsonData(data.destinations || []);
-    } catch (error) {
-      console.error('Error fetching JSON data:', error);
-    }
-  };
 
   const loadTripData = () => {
     const saved = localStorage.getItem('savedRecommendations');
@@ -134,24 +90,13 @@ function GastosContent() {
         const foundTrip = parsed.find((rec: SavedRecommendation) => rec.id === tripId);
         if (foundTrip) {
           setTrip(foundTrip);
-          
-          // Use JSON data for estimated costs if available
-          if (foundTrip.jsonData) {
-            setEstimatedCosts({
-              flights: foundTrip.jsonData.flight_price,
-              activities: foundTrip.jsonData.activities_price,
-              stay: foundTrip.jsonData.hotel.price,
-              meals: foundTrip.jsonData.meals_price || foundTrip.jsonData.average_meals_price
-            });
-          } else if (foundTrip.pricing) {
+          if (foundTrip.pricing) {
             setEstimatedCosts(foundTrip.pricing);
           }
-          
           // Load actual costs if they exist
           if (foundTrip.actualCosts) {
             setActualCosts(foundTrip.actualCosts);
           }
-          
           // Load activities and meals lists if they exist
           if (foundTrip.activitiesList) {
             setActivitiesList(foundTrip.activitiesList);
@@ -165,51 +110,6 @@ function GastosContent() {
       }
     }
   };
-
-  // Enhance trip data with JSON when JSON data is loaded
-  useEffect(() => {
-    if (trip && jsonData.length > 0) {
-      const matchingJson = jsonData.find(jsonDest => 
-        jsonDest.destination.toLowerCase().includes(trip.name.toLowerCase()) ||
-        trip.location.toLowerCase().includes(jsonDest.destination.toLowerCase())
-      );
-
-      if (matchingJson && !trip.jsonData) {
-        // Update estimated costs with JSON data
-        setEstimatedCosts({
-          flights: matchingJson.flight_price,
-          activities: matchingJson.activities_price,
-          stay: matchingJson.hotel.price,
-          meals: matchingJson.meals_price || matchingJson.average_meals_price
-        });
-
-        // Update trip with JSON data
-        const updatedTrip = {
-          ...trip,
-          jsonData: {
-            flight_link: matchingJson.flight_link,
-            hotel: matchingJson.hotel,
-            image: matchingJson.image,
-            flight_price: matchingJson.flight_price,
-            meals_price: matchingJson.meals_price || matchingJson.average_meals_price,
-            activities_price: matchingJson.activities_price
-          },
-          estimatedCost: matchingJson.price_total
-        };
-        setTrip(updatedTrip);
-
-        // Update localStorage
-        const saved = localStorage.getItem('savedRecommendations');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          const updated = parsed.map((rec: SavedRecommendation) => 
-            rec.id === tripId ? updatedTrip : rec
-          );
-          localStorage.setItem('savedRecommendations', JSON.stringify(updated));
-        }
-      }
-    }
-  }, [jsonData, trip, tripId]);
 
   const handleActualCostChange = (category: keyof TripPricing, value: string) => {
     const numValue = parseInt(value) || 0;
@@ -416,23 +316,13 @@ function GastosContent() {
   const isOnBudget = actualTotal <= estimatedTotal;
   const isTripFinished = trip?.isFinished;
 
-  // Get hotel name from JSON data
-  const getHotelName = () => {
-    return trip?.jsonData?.hotel?.name || 'Hotel';
-  };
-
-  // Get flight link from JSON data
-  const getFlightLink = () => {
-    return trip?.jsonData?.flight_link || '#';
-  };
-
   if (!trip) {
     return (
       <main className="min-h-screen p-8 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <Link href="/gerir" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6">
             <ArrowLeft className="h-4 w-4" />
-            Back to Management
+            Back to Gerir
           </Link>
           <div className="text-center py-12">
             <p className="text-gray-500">Trip not found</p>
@@ -701,18 +591,13 @@ function GastosContent() {
         <div className="mb-8">
           <Link href="/gerir" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6">
             <ArrowLeft className="h-4 w-4" />
-            Back to Management
+            Back to Gerir
           </Link>
           
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Costs</h1>
               <p className="text-lg text-gray-600">{trip.location} • {trip.name}</p>
-              {trip.jsonData?.hotel && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Stay: {getHotelName()}
-                </p>
-              )}
             </div>
             
             <div className="flex items-center gap-3">
@@ -772,16 +657,6 @@ function GastosContent() {
                   <span className="font-medium text-gray-700">Flights</span>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{estimatedCosts.flights} €</p>
-                {trip.jsonData?.flight_link && (
-                  <a 
-                    href={getFlightLink()} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-700 mt-2 inline-block"
-                  >
-                    View flight options →
-                  </a>
-                )}
               </div>
 
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -792,9 +667,6 @@ function GastosContent() {
                   <span className="font-medium text-gray-700">Stay</span>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{estimatedCosts.stay} €</p>
-                {trip.jsonData?.hotel && (
-                  <p className="text-sm text-gray-600 mt-1">{getHotelName()}</p>
-                )}
               </div>
             </div>
 
@@ -963,7 +835,7 @@ function GastosContent() {
               onClick={handleFinishStart}
               className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
             >
-              Finish Trip
+              Finish
             </button>
           </div>
         )}
