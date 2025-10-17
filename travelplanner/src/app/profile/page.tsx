@@ -137,7 +137,7 @@ export default function ProfilePage() {
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>My Saved Trips</CardTitle>
+                <CardTitle>Travel Plans</CardTitle>
                 <CardDescription>Your created travel plans</CardDescription>
               </div>
               {savedTrips.length > 0 && (
