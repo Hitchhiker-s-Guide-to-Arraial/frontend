@@ -38,9 +38,9 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          name,
           email,
           password,
-          name,
         }),
       });
 
@@ -53,6 +53,7 @@ export default function RegisterPage() {
       console.log("Registration successful, attempting auto-login...");
 
       const result = await signIn("credentials", {
+        name,
         email,
         password,
         redirect: false,
