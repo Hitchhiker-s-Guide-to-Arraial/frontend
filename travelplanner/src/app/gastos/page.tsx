@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Plane, Utensils, Home, Activity, ArrowLeft, Check, Target, Loader2, X, Trophy, RotateCcw, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -36,6 +36,14 @@ interface SavedRecommendation {
 }
 
 export default function GastosPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GastosContent />
+    </Suspense>
+  );
+}
+
+function GastosContent() {
   const searchParams = useSearchParams();
   const tripId = searchParams.get('trip');
   const [trip, setTrip] = useState<SavedRecommendation | null>(null);
