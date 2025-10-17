@@ -156,7 +156,7 @@ export default function ProfilePage() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No trips saved yet</h3>
                   <p className="text-gray-500 mb-4">Create your first travel plan to see it here</p>
-                  <Button onClick={() => router.push("/planear")}>
+                  <Button onClick={() => router.push("/planear")} style={{backgroundColor: " #1E66FF"}}>
                     Create Trip Plan
                   </Button>
                 </div>
@@ -227,6 +227,7 @@ export default function ProfilePage() {
                             <Button 
                               onClick={() => getRecommendationsForTrip(trip)}
                               className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600"
+                              style={{backgroundColor: " #1E66FF"}}
                             >
                               <Sparkles className="h-4 w-4" />
                               Get Recommendations
@@ -250,7 +251,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button onClick={() => router.push("/planear")} className="py-4">
+              <Button onClick={() => router.push("/planear")} className="py-4" style={{backgroundColor: " #1E66FF"}}>
                 Create New Trip
               </Button>
               <Button variant="outline" onClick={() => router.push("/gerir")} className="py-4">

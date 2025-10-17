@@ -257,6 +257,7 @@ export default function PlanearPage() {
                 disabled={!formData.departure}
                 className="w-full h-12 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-end pr-6 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="Continue"
+                style={{backgroundColor: " #1E66FF"}}
               >
                 <img src="/arrow.svg" alt="Next" className="h-5 w-5" />
               </button>
@@ -536,7 +537,7 @@ export default function PlanearPage() {
                   </PopoverContent>
                 </Popover>
 
-                <Button onClick={() => setCurrentStep("endDate")} disabled={!startDate} className="w-full h-12 text-lg rounded-2xl">
+                <Button onClick={() => setCurrentStep("endDate")} disabled={!startDate} className="w-full h-12 text-lg rounded-2xl" style={{backgroundColor:"#1E66FF"}}>
                   Continue
                 </Button>
               </div>
@@ -619,7 +620,7 @@ export default function PlanearPage() {
                   </PopoverContent>
                 </Popover>
 
-                <Button onClick={() => setCurrentStep("activities")} disabled={!endDate} className="w-full h-12 text-lg rounded-2xl">
+                <Button onClick={() => setCurrentStep("activities")} disabled={!endDate} className="w-full h-12 text-lg rounded-2xl" style={{backgroundColor:"#1E66FF"}}>
                   Continue
                 </Button>
               </div>
@@ -734,7 +735,12 @@ export default function PlanearPage() {
                   key={activity}
                   variant={selectedActivities.includes(activity) ? "default" : "outline"}
                   onClick={() => toggleActivity(activity)}
-                  className="py-3 h-auto"
+                  className={`px-4 py-2 rounded-xl border transition-colors ${
+                  selectedActivities.includes(activity)
+                    ? "bg-[#1e66ff] text-white border-[#1e66ff]"
+                    : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+                }`}
+                  
                 >
                   {activity}
                 </Button>
@@ -749,6 +755,7 @@ export default function PlanearPage() {
                 }}
                 disabled={selectedActivities.length < 2}
                 className="w-full py-6 text-lg"
+                style={{backgroundColor:"#1E66FF"}}
               >
                 Continue ({selectedActivities.length} selected)
               </Button>
@@ -808,7 +815,7 @@ export default function PlanearPage() {
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">€</span>
             </div>
 
-            <Button onClick={() => setCurrentStep("summary")} disabled={!formData.budget} className="w-full max-w-md mx-auto h-12 text-lg rounded-2xl">
+            <Button onClick={() => setCurrentStep("summary")} disabled={!formData.budget} className="w-full max-w-md mx-auto h-12 text-lg rounded-2xl" style={{backgroundColor:"#1E66FF"}}>
               Continue
             </Button>
 
@@ -852,7 +859,7 @@ export default function PlanearPage() {
               <div><strong>Budget:</strong> €{formData.budget}</div>
             </div>
 
-            <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full max-w-xl mx-auto h-12 text-lg rounded-2xl">
+            <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full max-w-xl mx-auto h-12 text-lg rounded-2xl"style={{backgroundColor:"#1E66FF"}}>
               {isSubmitting ? (<><Loader2 className="mr-2 h-5 w-5 animate-spin" />Creating Plan...</>) : ("Create Trip Plan")}
             </Button>
 
@@ -879,11 +886,11 @@ export default function PlanearPage() {
     <main className="min-h-screen p-4 bg-[#F5F7FF] flex items-center justify-center">
       {/* Toast de sucesso */}
       {showSuccess && (
-        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
+        <div className="fixed top-4 right-4 z-50 bg-blue-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
           <CheckCircle2 className="h-5 w-5" />
           <div>
-            <p className="font-semibold">Plano criado com sucesso!</p>
-            <p className="text-sm text-green-100">A redirecionar...</p>
+            <p className="font-semibold">Plan successfully created!</p>
+            <p className="text-sm text-green-100">Redirecting...</p>
           </div>
         </div>
       )}
