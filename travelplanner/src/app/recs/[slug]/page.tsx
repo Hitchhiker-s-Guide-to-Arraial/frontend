@@ -2,51 +2,13 @@
 
 import { notFound, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { use, useState, useEffect } from 'react';
+import { use, useState } from 'react';
 import { CheckCircle2, Loader2, Info, Plane, Utensils, Home, Activity, ExternalLink, ArrowLeft } from 'lucide-react';
 
 interface Props {
   params: Promise<{
     slug: string;
   }>;
-}
-
-interface JsonDestination {
-  destination: string;
-  image: string;
-  flight_price: number;
-  flight_link: string;
-  meals_price: number;
-  activities_price: number;
-  hotel: {
-    name: string;
-    link: string;
-    price: number;
-  };
-  price_total: number;
-  travelers: number;
-}
-
-interface Recommendation {
-  id: number;
-  name: string;
-  description: string;
-  location: string;
-  estimatedCost: number;
-  bestSeason: string;
-  activities: string[];
-  matchScore: number;
-  slug: string;
-  image: string;
-  flight_price: number;
-  flight_link: string;
-  meals_price: number;
-  activities_price: number;
-  hotel: {
-    name: string;
-    link: string;
-    price: number;
-  };
 }
 
 export default function RecommendationDetail({ params }: Props) {
@@ -56,14 +18,12 @@ export default function RecommendationDetail({ params }: Props) {
   const [isGoingToGerir, setIsGoingToGerir] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showAlreadySaved, setShowAlreadySaved] = useState(false);
-  const [jsonData, setJsonData] = useState<JsonDestination[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   
   // Unwrap the params promise using React.use()
   const unwrappedParams = use(params);
   
-  // Get basic data from query parameters
-  const baseRecommendation = {
+  // Get data from query parameters or fallback to hardcoded data
+  const recommendation = {
     id: parseInt(unwrappedParams.slug.split('-')[1]) || 1,
     name: searchParams.get('name') || 'Unknown Recommendation',
     description: searchParams.get('description') || 'No description available',
@@ -75,87 +35,25 @@ export default function RecommendationDetail({ params }: Props) {
     slug: unwrappedParams.slug
   };
 
-  // Fetch JSON data
-  useEffect(() => {
-    const fetchJsonData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch('/without_destination 1.json');
-        const data = await response.json();
-        setJsonData(data.destinations || []);
-      } catch (error) {
-        console.error('Error fetching JSON data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchJsonData();
-  }, []);
-
-  // Find matching destination from JSON data
-  const findMatchingDestination = (): Recommendation | null => {
-    if (!jsonData.length) return null;
-
-    // Try to find by exact name match first
-    const exactMatch = jsonData.find(dest => 
-      dest.destination.toLowerCase().includes(baseRecommendation.name.toLowerCase())
-    );
-
-    if (exactMatch) {
-      return createRecommendationFromJson(exactMatch, baseRecommendation.id);
-    }
-
-    // Fallback: use the ID from slug or try index-based matching
-    const destinationIndex = baseRecommendation.id - 1;
-    if (jsonData[destinationIndex]) {
-      return createRecommendationFromJson(jsonData[destinationIndex], baseRecommendation.id);
-    }
-
-    // Final fallback: use first destination
-    return createRecommendationFromJson(jsonData[0], baseRecommendation.id);
-  };
-
-  const createRecommendationFromJson = (jsonDest: JsonDestination, id: number): Recommendation => ({
-    id: id,
-    name: jsonDest.destination.split(',')[0],
-    description: `Perfect trip to ${jsonDest.destination} for ${jsonDest.travelers} travelers`,
-    location: jsonDest.destination,
-    estimatedCost: jsonDest.price_total,
-    bestSeason: "All Year",
-    activities: ["Sightseeing", "Cultural Tours", "Local Cuisine"],
-    matchScore: Math.floor(85 + Math.random() * 15),
-    slug: `rec-${id}`,
-    image: jsonDest.image,
-    flight_price: jsonDest.flight_price,
-    flight_link: jsonDest.flight_link,
-    meals_price: jsonDest.meals_price || 30,
-    activities_price: jsonDest.activities_price,
-    hotel: jsonDest.hotel
-  });
-
-  // Use JSON data if available, otherwise fallback to query params and hardcoded data
-  const recommendation = findMatchingDestination() || baseRecommendation;
-
-  // Get pricing data from JSON or fallback to hardcoded
+  // Hardcoded pricing data with names and links (will be replaced with JSON later)
   const pricingData = {
     flights: {
-      price: recommendation.flight_price || 300,
-      name: recommendation.hotel?.name || "Various Airlines",
-      link: recommendation.flight_link || "https://www.skyscanner.pt/"
+      price: 300,
+      name: "TAP Air Portugal",
+      link: "https://www.flytap.com"
     },
     activities: {
-      price: recommendation.activities_price || 150,
+      price: 150,
       name: "City Tours & Museums",
       link: "https://www.getyourguide.com"
     },
     stay: {
-      price: recommendation.hotel?.price || 200,
-      name: recommendation.hotel?.name || "Hotel Premium Collection",
-      link: recommendation.hotel?.link || "https://www.booking.com"
+      price: 200,
+      name: "Hotel Premium Collection",
+      link: "https://www.booking.com"
     },
     meals: {
-      price: recommendation.meals_price || 100,
+      price: 100,
       name: "Local Restaurants",
       link: "https://www.thefork.com"
     }
@@ -169,7 +67,7 @@ export default function RecommendationDetail({ params }: Props) {
     setIsAddingToGerir(true);
     
     try {
-      // Get the current recommendation data WITH pricing data from JSON
+      // Get the current recommendation data WITH pricing data
       const recommendationData = {
         id: Date.now().toString(),
         name: recommendation.name,
@@ -181,18 +79,12 @@ export default function RecommendationDetail({ params }: Props) {
         matchScore: recommendation.matchScore,
         slug: recommendation.slug,
         savedAt: new Date(),
-        // ADD THE PRICING DATA FROM JSON:
+        // ADD THE PRICING DATA:
         pricing: {
           flights: pricingData.flights.price,
           activities: pricingData.activities.price,
           stay: pricingData.stay.price,
           meals: pricingData.meals.price
-        },
-        // Also save the JSON-specific data for future use
-        jsonData: {
-          flight_link: recommendation.flight_link,
-          hotel: recommendation.hotel,
-          image: recommendation.image
         }
       };
 
@@ -244,18 +136,6 @@ export default function RecommendationDetail({ params }: Props) {
   const handleGoBack = () => {
     router.back(); // This will go back to the previous page (Recs main page)
   };
-
-  // Show loading state while fetching JSON data
-  if (isLoading) {
-    return (
-      <main className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading destination details...</p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen p-8">
@@ -416,10 +296,10 @@ export default function RecommendationDetail({ params }: Props) {
             {isGoingToGerir ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                Going to Management...
+                Going to Gerir...
               </>
             ) : (
-              'Go to Management Page'
+              'Go to Gerir Page'
             )}
           </button>
 
