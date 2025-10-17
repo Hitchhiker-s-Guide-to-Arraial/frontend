@@ -327,8 +327,22 @@ export default function RecsPage() {
                     )}
                   </div>
                 </div>
-                
-                <Link href={`/recs/${rec.slug}`} className="block">
+
+                <Link
+                  href={{
+                    pathname: `/recs/${rec.slug}`,
+                    query: {
+                      name: rec.name,
+                      description: rec.description,
+                      location: rec.location,
+                      estimatedCost: rec.estimatedCost,
+                      bestSeason: rec.bestSeason,
+                      activities: JSON.stringify(rec.activities),
+                      matchScore: rec.matchScore
+                    }
+                  }}
+                  className="block"
+                >
                   <button className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition font-semibold">
                     View Details
                   </button>

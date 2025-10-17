@@ -1,9 +1,9 @@
 "use client";
 
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { use, useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 
 interface Props {
   params: Promise<{
@@ -11,73 +11,78 @@ interface Props {
   }>;
 }
 
-const recommendationData: { [key: string]: any } = {
-  'rec-1': {
-    id: 1,
-    name: 'Recommendation 1',
-    description: 'Detailed information about recommendation 1',
-    color: 'blue',
-  },
-  'rec-2': {
-    id: 2,
-    name: 'Recommendation 2', 
-    description: 'Detailed information about recommendation 2',
-    color: 'green',
-  },
-  'rec-3': {
-    id: 3,
-    name: 'Recommendation 3',
-    description: 'Detailed information about recommendation 3', 
-    color: 'purple',
-  },
-  'rec-4': {
-    id: 4,
-    name: 'Recommendation 4',
-    description: 'Detailed information about recommendation 4',
-    color: 'orange',
-  },
-  'rec-5': {
-    id: 5,
-    name: 'Recommendation 5',
-    description: 'Detailed information about recommendation 5',
-    color: 'red',
-  },
-};
-
 export default function RecommendationDetail({ params }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isAddingToGerir, setIsAddingToGerir] = useState(false);
   const [isGoingToGerir, setIsGoingToGerir] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   
   // Unwrap the params promise using React.use()
   const unwrappedParams = use(params);
-  const recommendation = recommendationData[unwrappedParams.slug];
+  
+  // Get data from query parameters or fallback to hardcoded data
+  const recommendation = {
+    id: parseInt(unwrappedParams.slug.split('-')[1]) || 1,
+    name: searchParams.get('name') || 'Unknown Recommendation',
+    description: searchParams.get('description') || 'No description available',
+    location: searchParams.get('location') || 'Unknown Location',
+    estimatedCost: parseInt(searchParams.get('estimatedCost') || '0'),
+    bestSeason: searchParams.get('bestSeason') || 'All Year',
+    activities: JSON.parse(searchParams.get('activities') || '[]'),
+    matchScore: parseInt(searchParams.get('matchScore') || '0'),
+    slug: unwrappedParams.slug
+  };
 
   if (!recommendation) {
     notFound();
   }
 
+  // ... rest of the component remains the same
   const handleAddToGerir = async () => {
     setIsAddingToGerir(true);
     
     try {
-      // TODO: Add API call to save to backend
-      console.log('Adding to gerir:', recommendation);
+      // Get the current recommendation data
+      const recommendationData = {
+        id: Date.now().toString(),
+        name: recommendation.name,
+        description: recommendation.description,
+        location: recommendation.location,
+        estimatedCost: recommendation.estimatedCost,
+        bestSeason: recommendation.bestSeason,
+        activities: recommendation.activities,
+        matchScore: recommendation.matchScore,
+        slug: recommendation.slug,
+        savedAt: new Date()
+      };
+
+      // Get existing saved recommendations
+      const existing = JSON.parse(localStorage.getItem('savedRecommendations') || '[]');
       
-      // For now, save to localStorage or show alert
-      const existing = JSON.parse(localStorage.getItem('gerirItems') || '[]');
-      const updated = [...existing, recommendation];
-      localStorage.setItem('gerirItems', JSON.stringify(updated));
-      
-      // Wait 1.5 seconds
+      // Check if already saved
+      const alreadyExists = existing.some((rec: any) => rec.slug === recommendation.slug);
+      if (alreadyExists) {
+        alert('This recommendation is already saved to Gerir!');
+        return;
+      }
+
+      // Wait 1.5 seconds to show loading state
       await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Add new recommendation
+      const updated = [recommendationData, ...existing];
       
-      // Show toast instead of alert
+      // Save to storage
+      localStorage.setItem('savedRecommendations', JSON.stringify(updated));
+      
+      // Show success toast
       setShowSuccess(true);
-      // Auto hide toast after 3 seconds
       setTimeout(() => setShowSuccess(false), 3000);
       
+    } catch (error) {
+      console.error('Error saving recommendation:', error);
+      alert('Error saving recommendation. Please try again.');
     } finally {
       setIsAddingToGerir(false);
     }
@@ -112,10 +117,27 @@ export default function RecommendationDetail({ params }: Props) {
         <h1 className="text-4xl font-bold mb-4">{recommendation.name}</h1>
         <p className="text-lg text-gray-600 mb-8">{recommendation.description}</p>
         
-        {/* Add more details here */}
+        {/* Trip Details */}
         <div className="bg-gray-100 p-6 rounded-lg mb-8">
-          <h2 className="text-2xl font-semibold mb-4">More Details</h2>
-          <p>Additional information about this recommendation would go here.</p>
+          <h2 className="text-2xl font-semibold mb-4">Trip Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p><strong>Location:</strong> {recommendation.location}</p>
+              <p><strong>Best Season:</strong> {recommendation.bestSeason}</p>
+              <p><strong>Estimated Cost:</strong> €{recommendation.estimatedCost}</p>
+              <p><strong>Match Score:</strong> {recommendation.matchScore}%</p>
+            </div>
+            <div>
+              <p><strong>Activities:</strong></p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {recommendation.activities.map((activity: string, index: number) => (
+                  <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    {activity}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Go to Gerir Button - In main content */}
@@ -127,12 +149,12 @@ export default function RecommendationDetail({ params }: Props) {
           >
             {isGoingToGerir ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Going to Gerir...</span>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Going to Gerir...
               </>
             ) : (
               <>
-                <span>Go to Gerir Page</span>
+                Go to Gerir Page
                 <span>→</span>
               </>
             )}
@@ -148,12 +170,12 @@ export default function RecommendationDetail({ params }: Props) {
           >
             {isAddingToGerir ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Adding...</span>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Adding...
               </>
             ) : (
               <>
-                <span>Add to Gerir</span>
+                Add to Gerir
                 <span className="text-xl">+</span>
               </>
             )}
