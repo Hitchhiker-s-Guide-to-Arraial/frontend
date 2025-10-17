@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🔄 Forward the request to your backend API
+    // Forward to FastAPI /register (not /api/register unless you mounted it)
     const backendResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/register`,
       {
@@ -25,18 +25,17 @@ export async function POST(request: Request) {
 
     if (!backendResponse.ok) {
       return NextResponse.json(
-        { error: data.error || "Registration failed" },
+        { error: data?.detail || data?.error || "Registration failed" },
         { status: backendResponse.status }
       );
     }
 
-    // ✅ Registration successful
     return NextResponse.json(
-      { message: "User registered successfully", data },
+      { message: "User registered successfully", user: data },
       { status: 201 }
     );
   } catch (error) {
-    console.error("❌ Registration error:", error);
+    console.error("Registration error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
